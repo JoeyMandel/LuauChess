@@ -91,7 +91,7 @@ end
 function ChessBoard:Update(action)
 	self:PreUpdate(action)
 	self:ProcessUpdate(action)
-	self:PostUpdate(action)
+	self:AfterUpdate(action)
 end
 
 function ChessBoard:Destroy()
@@ -99,17 +99,16 @@ function ChessBoard:Destroy()
 end
 
 --//Update sub-functions
-function ChessBoard:PreUpdate()
+function ChessBoard:PreUpdate(action)
 	self.UpdateReceived:Fire()
 	self:CleanState()
+end
+
+function ChessBoard:ProcessUpdate(action)
 
 end
 
-function ChessBoard:ProcessUpdate()
-	
-end
-
-function ChessBoard:PostUpdate(action)
+function ChessBoard:AfterUpdate(action)
 	print("[Client Board]: Piece Moved: "..BoardUtil.GetColor(piece.IsBlack).." "..piece.Type.." : "
 		..BoardUtil.ANFromVector2(action[1]).." -> "..BoardUtil.ANFromVector2(changes[2]))	
 
@@ -205,28 +204,35 @@ end
 		6. Fires AfterMoved
 ]]
 function ChessBoard:Move(pos1,pos2,config)
-	local board = self.Board
+	local board = self:Get("Board")
 	local piece =  BoardUtil.Get(board,pos1).Piece
 	local moveInfo = BoardUtil.Get(piece.LegalMoves,pos2)
-	
-	table.clear(self.White.Checking)
-	table.clear(self.Black.Checking)
 
 	if moveInfo and (not piece.IsBlack == self.WhiteToNextMove) then
-		local changes
-		if typeof(moveInfo) == "table" then
-			changes = moveInfo
-		else
-			changes = {pos1,pos2}			
-		end
 		if piece:HasTag("InputPossible") then
 			warn("Input changed Changes")
-			changes = piece:ApplyInput(pos2,config)
+			moveInfo = piece:ApplyInput(pos2,config)
 		end
 	
-		self.BeforeMoved:Fire(changes)
-		piece:BeforeUpdate(changes)
-		warn(self:ANFromMoveInfo(changes))
+		self.BeforeMoved:Fire(moveInfo)
+		piece:BeforeUpdate(moveInfo)
+		warn(self:ANFromMoveInfo(moveInfo))
+
+		for _,action in pairs(moveInfo) do
+			local actionType = action.Type
+			if actionType == "Move" then
+				local origPos = action.Orig
+				local targetPos = action.Target
+				
+				local origTile = BoardUtil.Get(board,origPos)
+				local targetTile = BoardUtil.Get(board,targetPos)
+			elseif actionType == "Create" then
+			
+			elseif  actionType == "Destroy" then
+				
+			end
+  		end
+
 		for offset = 1,#changes,2 do
 			local origPos = changes[offset]
 			local targetPos = changes[offset+1]
