@@ -17,6 +17,7 @@ function BaseComponent.new(piece)
 	local framework = require(script.Parent)
 	local self = setmetatable({
 		["Piece"] = piece,
+		["Board"] = piece:Get("Board"),
 		["Position"] = piece.Position,
 		["_maid"] = framework.Shared.Utils.Maid.new()
 	}, BaseComponent)

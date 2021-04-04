@@ -7,80 +7,71 @@
 	local Castling = Castling.new()
 	
 
---]]
-local BoardUtil
+	--]]
 local BaseComponent = require(script.Parent.BaseComponent)
 
+local BoardUtil
+local toInt
+
+local Action
 
 local Castling = setmetatable({},BaseComponent)
 Castling.__index = Castling
 
 function Castling:BeforeUpdate()
 	--//When a piece is moved remove castling rights
-	self.Piece.CanCastle = false
+	self.Piece:Set("CanCastle",false)
+end
+
+function Castling:CheckIfIsValidPath(pos1: number,pos2: number)
+	local isValidPath = true
+	local oppColor = BoardUtil.GetColor(not self.IsBlack)
+
+	local board = self.Board:Get("Board")
+	for offPos = pos1,pos2,(pos2 < pos1 and -1 or 1) do
+		local tile = BoardUtil:Get(board,offPos)
+		local attacking = BoardUtil:Get(self.Board:Get(oppColor).Attacking,offPos)
+		if tile or attacking then
+			if tile.Piece or attacking then
+				isValidPath = false
+				break
+			end
+		end
+	end
 end
 
 function Castling:ComputeLegalMoves()
 	local piece = self.Piece
-	local board = piece.Board
-	local boardHolder = board.Board
-	local currentPos = piece.Position
+	local board = self.Board
+	local currentPos = toInt(piece:Get("Position"))
 
-	if piece:HasTag("King") and piece.CanCastle then
-		local oppColor = BoardUtil.GetColor(not piece.IsBlack)
-		local curColor = BoardUtil.GetColor(piece.IsBlack)
-		local rookQ 
-		local rookK
-		--//Change rook positions depending on side
-		if piece.IsBlack then
-			rookQ = piece:GetPiece(Vector2.new(1,8))
-			rookK = piece:GetPiece(Vector2.new(8,8))
-		else
-			rookQ = piece:GetPiece(Vector2.new(1,1))
-			rookK = piece:GetPiece(Vector2.new(8,1))
-		end
+	if piece:HasTag("King") and piece:Get("CanCastle") then
+		local oppColor = BoardUtil.GetColor(not piece:Get("IsBlack"))
+		local curColor = BoardUtil.GetColor(piece:Get("IsBlack"))
+
+		local yVal = piece:Get("IsBlack") and 8 or 1
+		local rookQ = piece:GetPiece(Vector2.new(1,yVal))
+		local rookK = piece:GetPiece(Vector2.new(8,yVal))
 		--//Check for both rooks
 		if rookQ then	
-			local pathClear = #board[curColor].Checking == 0 and true
-			--//Check if the path to castling is clear and unattacked
-			local offOne = currentPos - Vector2.new(1,0)
-			local offTwo = currentPos - Vector2.new(2,0)
-			if not board:IsAttacking(oppColor,offOne) and not BoardUtil.Get(boardHolder,offOne).Piece then
-				if board:IsAttacking(oppColor,offTwo) or BoardUtil.Get(boardHolder,offTwo).Piece then
-					pathClear = false
-				else
-					if BoardUtil.Get(boardHolder,currentPos - Vector2.new(3,0)).Piece then
-						pathClear = false
-					end
-				end
-			else
-				pathClear = false
-			end
+			local pathClear = self:CheckIfIsValidPath(currentPos,currentPos - 3)
 			--//Check all possibilities
-			if rookQ:HasTag("Rook") and rookQ.IsBlack == piece.IsBlack and rookQ.CanCastle and pathClear then
-				local newKingPos = currentPos - Vector2.new(2,0)
-				local newRookPos = rookQ.Position + Vector2.new(3,0)
-				piece:AddLegalMove(newKingPos,{currentPos,newKingPos,rookQ.Position,newRookPos})
+			if rookQ:HasTag("Rook") and rookQ:Get("IsBlack") == piece:Get("IsBlack") and rookQ:Get("CanCastle") and pathClear then
+				local newKingPos = currentPos - 2
+				local rookPos = toInt(rookQ:Get("Position"))
+				local newRookPos = rookPos + 3
+				piece:AddLegalMove(newKingPos,Action.new("Move",currentPos,newKingPos,"Move",rookPos,newRookPos))
 			end
 		end
 		
 		if rookK then
-			local pathClear = #board[curColor].Checking == 0 and true
-			--//Path check
-			local offOne = currentPos + Vector2.new(1,0)
-			local offTwo = currentPos + Vector2.new(2,0)
-			if not piece.Board:IsAttacking(oppColor,offOne) and not BoardUtil.Get(boardHolder,offOne).Piece then
-				if piece.Board:IsAttacking(oppColor,offTwo) or BoardUtil.Get(boardHolder,offTwo).Piece then
-					pathClear = false
-				end
-			else
-				pathClear = false
-			end
+			local pathClear = self:CheckIfIsValidPath(currentPos,currentPos + 2)
 			--//Check all possibilities
-			if rookK:HasTag("Rook") and rookK.IsBlack == piece.IsBlack and rookK.CanCastle and pathClear then
-				local newKingPos = currentPos + Vector2.new(2,0)
-				local newRookPos = rookK.Position - Vector2.new(2,0)
-				piece:AddLegalMove(newKingPos,{currentPos,newKingPos,rookK.Position,newRookPos})
+			if rookK:HasTag("Rook") and rookK:Get("IsBlack") == piece:Get("IsBlack") and rookK:Get("CanCastle") and pathClear then
+				local newKingPos = currentPos + 2
+				local rookPos = toInt(rookQ:Get("Position"))
+				local newRookPos = rookPos - 2
+				piece:AddLegalMove(newKingPos,Action.new("Move",currentPos,newKingPos,"Move",rookPos,newRookPos))
 			end
 		end
 	end
@@ -90,7 +81,6 @@ function Castling.new(piece)
 	local base = BaseComponent.new(piece)
 	local self = setmetatable(base, Castling)
 	
-	local piece = self.Piece
 	piece.CanCastle = false
 	
 	local currentPos = piece.Position
@@ -98,22 +88,22 @@ function Castling.new(piece)
 	if piece:HasTag("Rook") then
 		--//Determine if the rook is in a valid castling position and add position to valid positions
 		if piece.IsBlack then
-			validPos[BoardUtil.Vector2ToInt(1,8)] = true
-			validPos[BoardUtil.Vector2ToInt(8,8)] = true
+			validPos[toInt(1,8)] = true
+			validPos[toInt(8,8)] = true
 		else
-			validPos[BoardUtil.Vector2ToInt(1,1)] = true
-			validPos[BoardUtil.Vector2ToInt(8,1)] = true
+			validPos[toInt(1,1)] = true
+			validPos[toInt(8,1)] = true
 		end
 	elseif piece:HasTag("King") then
 		--//Determine if the king is in a valid castling position
 		if piece.IsBlack then
-			validPos[BoardUtil.Vector2ToInt(5,8)] = true
+			validPos[toInt(5,8)] = true
 		else
-			validPos[BoardUtil.Vector2ToInt(5,1)] = true
+			validPos[toInt(5,1)] = true
 		end
 	end
 	--// If valid then can castle :)
-	if validPos[BoardUtil.Vector2ToInt(currentPos)] then
+	if validPos[toInt(currentPos)] then
 		piece.CanCastle = true
 	end
 	
@@ -123,6 +113,8 @@ end
 
 function Castling:Init(framework)
 	BoardUtil = framework.Shared.Utils.BoardUtil
+	toInt = BoardUtil.Vector2ToInt
+	Action = self.Shared.Action
 end
 
 return Castling

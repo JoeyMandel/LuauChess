@@ -119,10 +119,10 @@ function Piece:Pin(pos)
 
 	local piece = self:GetPiece(pos)
 	if piece then
-		warn("[Client Board]: "..piece.Type.." ,"..BoardUtil.ANFromVector2(piece.Position).." was pinned by "
+		warn("[Client Board]: "..piece.Type.." ,"..BoardUtil.ANFromVector2(piece:Get("Position")).." was pinned by "
 			..self.Type.." ,"..BoardUtil.ANFromVector2(self:Get("Position")))
 		self:Get("Pinning")[piece] = true
-		piece.PinnedBy[self] = true
+		piece:Get("PinnedBy")[self] = true
 	end
 end
 
@@ -131,7 +131,7 @@ function Piece:UnPin(piece)
 	local oppColor = BoardUtil.GetColor(not self.IsBlack)
 
 	self:Get("Pinning")[piece] = nil
-	piece.PinnedBy[self] = nil
+	piece:Get("PinnedBy")[self] = nil
 end
 --//General
 function Piece.new(name,pos,board,color)
@@ -171,7 +171,7 @@ function Piece:Destroy()
 	local colorName = self:Get("IsBlack") and "Black" or "White"
 	for index,piece in pairs(board[colorName].Pieces) do
 		if piece == self then
-			warn("[Client Board]: Piece Destroyed: "..piece.Type.."! | "..tostring(piece.Position))	
+			warn("[Client Board]: Piece Destroyed: "..piece.Type.."! | "..tostring(piece:Get("Position")))	
 			board[colorName].Pieces[index] = nil
 		end
 	end
