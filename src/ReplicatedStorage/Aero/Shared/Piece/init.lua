@@ -80,57 +80,57 @@ function Piece:ComputeLegalMoves()
 end
 
 function Piece:AddLegalMove(position,moveInfo)
-	local color = self.IsBlack and "Black" or "White"	
+	local color = self:Get("IsBlack") and "Black" or "White"	
 	BoardUtil.Set(self:Get("LegalMoves"),position,moveInfo)
-	local legalMoves = BoardUtil.Get(self.Board[color].LegalMoves,position)
+	local legalMoves = BoardUtil.Get(self:Get("Board")[color].LegalMoves,position)
 	if legalMoves then
 		legalMoves[self] = true
 	end
 end
 
 function Piece:RemoveLegalMove(position)
-	local color = self.IsBlack and "Black" or "White"
+	local color = self:Get("IsBlack") and "Black" or "White"
 	
-	BoardUtil.Set(self.LegalMoves,position,nil)
-	local legalMoves = BoardUtil.Get(self.Board[color].LegalMoves,position)
+	BoardUtil.Set(self:Get("LegalMoves"),position,nil)
+	local legalMoves = BoardUtil.Get(self:Get("Board")[color].LegalMoves,position)
 	if legalMoves then
 		legalMoves[self] = nil
 	end
 end
 
 function Piece:AddAttackingMove(position)
-	local color = self.IsBlack and "Black" or "White"
-	BoardUtil.Set(self.Attacking,position,true)
-	BoardUtil.Set(self.Board[color].Attacking,position,true)
+	local color = self:Get("IsBlack") and "Black" or "White"
+	BoardUtil.Set(self:Get("Attacking"),position,true)
+	BoardUtil.Set(self:Get("Board")[color].Attacking,position,true)
 end
 
 function Piece:AddToPath(position)
-	BoardUtil.Set(self.PathOfAttack,position,true)
+	BoardUtil.Set(self:Get("PathOfAttack"),position,true)
 end
 --//Pinning
 function Piece:RemovePinning()
-	for piece,_ in pairs(self.Pinning) do
+	for piece,_ in pairs(self:Get("Pinning")) do
 		self:UnPin(piece)
 	end
 end
 function Piece:Pin(pos)
-	local board = self.Board.board
-	local oppColor = BoardUtil.GetColor(not self.IsBlack)
+	local board = self:Get("Board"):Get("Board") --// Ah Yes board get board
+	local oppColor = BoardUtil.GetColor(not self:Get("IsBlack"))
 
 	local piece = self:GetPiece(pos)
 	if piece then
 		warn("[Client Board]: "..piece.Type.." ,"..BoardUtil.ANFromVector2(piece.Position).." was pinned by "
-			..self.Type.." ,"..BoardUtil.ANFromVector2(self.Position))
-		self.Pinning[piece] = true
+			..self.Type.." ,"..BoardUtil.ANFromVector2(self:Get("Position")))
+		self:Get("Pinning")[piece] = true
 		piece.PinnedBy[self] = true
 	end
 end
 
 function Piece:UnPin(piece)
-	local board = self.Board.board
+	local board = self:Get("Board"):Get("Board")
 	local oppColor = BoardUtil.GetColor(not self.IsBlack)
 
-	self.Pinning[piece] = nil
+	self:Get("Pinning")[piece] = nil
 	piece.PinnedBy[self] = nil
 end
 --//General
@@ -166,12 +166,13 @@ end
 
 
 function Piece:Destroy()
-	BoardUtil.Get(self.Board.Board,self.Position).Piece = nil	
-	local colorName = self.IsBlack and "Black" or "White"
-	for index,piece in pairs(self.Board[colorName].Pieces) do
+	local board = self:Get("Board")
+	BoardUtil.Get(board:Get("Board"),self:Get("Position")).Piece = nil	
+	local colorName = self:Get("IsBlack") and "Black" or "White"
+	for index,piece in pairs(board[colorName].Pieces) do
 		if piece == self then
 			warn("[Client Board]: Piece Destroyed: "..piece.Type.."! | "..tostring(piece.Position))	
-			self.Board[colorName].Pieces[index] = nil
+			board[colorName].Pieces[index] = nil
 		end
 	end
 	
