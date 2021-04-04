@@ -32,14 +32,6 @@ function Piece:AfterUpdate(changes)
 end
 
 --//Utils
-
-function Piece:GetPiece(pos)
-	local tile = BoardUtil.Get(self.Board.Board,pos)
-	if tile then
-		return tile.Piece
-	end
-end
-
 function Piece:AddComponent(name,config)
 	self.Components[name] = self.Shared.PieceComponents.new(name,self,(config or {}))
 	self._maid:GiveTask(self.Components[name])
@@ -49,16 +41,25 @@ function Piece:RemoveComponent(name)
 	self.Components[name]:Destroy()
 	self.Components[name] = nil
 end
---//Movement
-function Piece:ResetTempVals()
-	BoardUtil.Reset(self.LegalMoves)
-	BoardUtil.Reset(self.Attacking)
-	BoardUtil.Reset(self.PathOfAttack)
+--//state
+function Piece:CleanState()
+	table.clear(self:Get("LegalMoves"))
+	table.clear(self:Get("Attacking"))
+	table.clear(self:Get("PathOfAttack"))
 	self:RemovePinning()
 end
 
+function Piece:Get(index)
+	return self.State[index]
+end
+
+function Piece:Set(index,newVal)
+	self.State[index] = newVal
+end
+--//Movement
+
 function Piece:ComputeLegalMoves()
-	self:ResetTempVals()
+	self:CleanState()
 	local doLast = {}
 	
 	for _,component in pairs(self.Components) do
@@ -67,21 +68,20 @@ function Piece:ComputeLegalMoves()
 		elseif component:HasTag("MovementLast") then
 			table.insert(doLast,component)
 		end
-		BoardUtil.Set(self.PathOfAttack,self.Position,true)
 	end
+	BoardUtil.Set(self:Get("PathOfAttack"),self:Get("Position"),true)
+
 	for _,component in pairs(doLast) do
 		component:FilterLegalMoves()
 	end
 
-	self.MoveNum = self.Board.MoveNumber
-	return self.LegalMoves
+	self:Set("MoveNum", self:Get("Board").MoveNumber)
+	return self:Get("LegalMoves")
 end
 
-function Piece:AddLegalMove(position,special)
-	local color = self.IsBlack and "Black" or "White"
-	local moveInfo = special or true
-	
-	BoardUtil.Set(self.LegalMoves,position,moveInfo)
+function Piece:AddLegalMove(position,moveInfo)
+	local color = self.IsBlack and "Black" or "White"	
+	BoardUtil.Set(self:Get("LegalMoves"),position,moveInfo)
 	local legalMoves = BoardUtil.Get(self.Board[color].LegalMoves,position)
 	if legalMoves then
 		legalMoves[self] = true
@@ -139,18 +139,18 @@ function Piece.new(name,pos,board,color)
 	local mod = script:FindFirstChild(name)
 	if mod then
 		local base = setmetatable({
-			["PinnedBy"] = {},
-			["Pinning"] = {},
-			["PathOfAttack"] = {},
-			
-			["LegalMoves"] = {},
-			["Attacking"] = {},
+			["State"] = { --// State is anything variable and not related to the very basic functions of a piece
+				["PinnedBy"] = {},
+				["Pinning"] = {},
+				["PathOfAttack"] = {},
+				["LegalMoves"] = {},
+				["Attacking"] = {},
+				["MoveNum"] = 0,
+				["Position"] = pos,
+				["IsBlack"] = color,
+				["Board"] = board,
+			},
 			["Components"] = {},
-			["Position"] = pos,
-			["IsBlack"] = color,
-			["Board"] = board,
-			["MoveNum"] = 0,
-			
 			["IsDead"] = false,
 			["_maid"] = Piece.Shared.Utils.Maid.new()
 		}, Piece)

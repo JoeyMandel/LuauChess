@@ -144,7 +144,15 @@ function ChessBoard:CleanState()
 	end
 end
 
+--// State
 
+function ChessBoard:Get(index)
+	return self.State[index]
+end
+
+function ChessBoard:Set(index,newVal)
+	self.State[index] = newVal
+end
 
 --// Other functions
 
