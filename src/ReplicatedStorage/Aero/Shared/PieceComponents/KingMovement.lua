@@ -10,6 +10,8 @@
 
 local BaseComponent = require(script.Parent.BaseComponent)
 
+local BoardUtil
+local toInt 
 
 local KingMovement = setmetatable({},BaseComponent)
 KingMovement.__index = KingMovement
@@ -25,11 +27,12 @@ function KingMovement:ComputeLegalMoves()
 	local opColor = piece.IsBlack and "White" or "Black"
 	for xOff = -1,1,1 do
 		for yOff = -1,1,1 do
-			piece:AddAttackingMove(piecePos + Vector2.new(xOff,yOff))
-			if ((xOff == 0) and (yOff == 0)) or piece.Board:IsAttacking(opColor,piecePos + Vector2.new(xOff,yOff)) then
+			local currentPos = piecePos + toInt(xOff,yOff)
+			piece:AddAttackingMove(currentPos)
+			if ((xOff == 0) and (yOff == 0)) or piece.Board:IsAttacking(opColor,currentPos) then
 				continue
 			end
-			piece:AddLegalMove(piecePos + Vector2.new(xOff,yOff))
+			piece:AddLegalMove(currentPos)
 		end
 	end
 end
@@ -41,5 +44,9 @@ function KingMovement.new(piece,config)
 	return self
 end
 
+function KingMovement:Init(framework)
+	BoardUtil = framework.Shared.Utils.BoardUtil
+	toInt = BoardUtil.Vector2ToInt
+end
 
 return KingMovement

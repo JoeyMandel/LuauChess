@@ -12,7 +12,7 @@
 
 
 local BaseComponent = require(script.Parent.BaseComponent)
-
+local BoardUtil
 
 local TwoAxisMovement = setmetatable({},BaseComponent)
 TwoAxisMovement.__index = TwoAxisMovement
@@ -23,26 +23,27 @@ end
 
 function TwoAxisMovement:ComputeLegalMoves()
 	local piece = self.Piece
-	local board = piece.Board.Board
-	local piecePos = piece.Position
-	local oppColor = BoardUtil.GetColor(not piece.IsBlack)
-	local distFromLeft = piecePos.X
+	local board = self.Board:Get("Board")
+	local piecePos = piece:Get("Position")
+	local oppColor = BoardUtil.GetColor(not piece:Get("IsBlack"))
+	
+	local distFromLeft = BoardUtil.GetX(piecePos)
 	local distFromRight = 8 - distFromLeft
-	local distFromBottom = piecePos.Y	
+	local distFromBottom = BoardUtil.GetY(piecePos)	
 	local distFromTop = 8-distFromBottom
 	
 	local path = {}
 	local isPinning = false
 	local checking = false
 
-	local function iterateThroughPath(dist,off1,off2)
+	local function iterateThroughPath(dist,dirX,dirY)
 		local piecesHit = 0
 		local enemyPiecesHit = 0 
 		local lastEnemyPiece
 		local lastPieceHit 
 
 		for offset = 1,dist do
-			local currentPos = piecePos + Vector2.new(offset*off1,offset*off2)
+			local currentPos = piecePos + (9*(dirX*offset)) + (offset*dirY)
 
 			if piecesHit == 0 then
 				piece:AddLegalMove(currentPos)
@@ -57,12 +58,12 @@ function TwoAxisMovement:ComputeLegalMoves()
 				piecesHit += 1
 
 				lastPieceHit = true
-				if (hitPiece.IsBlack ~= piece.IsBlack) then
+				if hitPiece:Get("IsBlack") ~= piece:Get("IsBlack") then
 					if enemyPiecesHit < 2 then
 						enemyPiecesHit += 1
 						if piecesHit == 2 then
-							if hitPiece == (piece.Board[oppColor].Pieces["King"]) then
-								piece:Pin(lastEnemyPiece.Position)
+							if hitPiece == (self.Board:Get(oppColor).Pieces["King"]) then
+								piece:Pin(lastEnemyPiece:Get("Position"))
 								isPinning = true
 							end
 							break
@@ -70,7 +71,7 @@ function TwoAxisMovement:ComputeLegalMoves()
 							if hitPiece == (piece.Board[oppColor].Pieces["King"]) then
 								checking = true
 								local dir = dist > 1 and 1 or -1
-								piece:AddAttackingMove(currentPos+Vector2.new(dir*off1,dir*off2))
+								piece:AddAttackingMove(currentPos+piecePos + (9*(dirX*(offset+1))) + ((1+offset)*dirY))
 								break
 							else
 								lastEnemyPiece = hitPiece

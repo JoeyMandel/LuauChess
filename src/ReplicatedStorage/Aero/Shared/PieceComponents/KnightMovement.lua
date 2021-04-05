@@ -9,7 +9,7 @@
 
 
 local BaseComponent = require(script.Parent.BaseComponent)
-
+local BoardUtil
 
 local KnightMovement = setmetatable({},BaseComponent)
 KnightMovement.__index = KnightMovement
@@ -20,17 +20,17 @@ end
 
 function KnightMovement:ComputeLegalMoves()
 	local piece = self.Piece
-	local board = piece.Board.Board
-	local piecePos = piece.Position
+	local board = self.Board:Get("Board")
+	local piecePos = piece:Get("Position")
 
 	--//For each axis, Y = -2, 2, X = -2,2, Go left or right one square and see if we can move to it
 	for off1 = -2,2,4 do
 		for off2 = -1,1,2 do
-			local posX = piecePos.X
-			local posY = piecePos.Y
+			local posX = BoardUtil.GetX(piecePos)
+			local posY = BoardUtil.GetY(piecePos)
 
-			local pos1 = Vector2.new(posX + off1,posY + off2)
-			local pos2 = Vector2.new(posX + off2, posY + off1)
+			local pos1 = BoardUtil.Vector2ToInt(posX + off1,posY + off2)
+			local pos2 = BoardUtil.Vector2ToInt(posX + off2,posY + off2)
 
 
 			piece:AddLegalMove(pos2) --//For X
@@ -48,6 +48,10 @@ function KnightMovement.new(piece,config)
 
 	self:AddTag("Movement")
 	return self
+end
+
+function  KnightMovement.new(framework)
+	BoardUtil = framework.Shared.Utils.BoardUtil
 end
 
 

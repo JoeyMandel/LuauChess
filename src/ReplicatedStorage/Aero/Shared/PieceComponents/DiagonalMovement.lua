@@ -58,22 +58,21 @@ function DiagonalMovement:ComputeLegalMoves()
 			local hitPiece = piece:GetPiece(currentPos)
 			if hitPiece then
 				piecesHit += 1
-				
 				lastPieceHit = true
-				if (hitPiece.IsBlack ~= piece.IsBlack) then
+				if (hitPiece:Get("IsBlack") ~= piece:Get("IsBlack")) then
 					if enemyPiecesHit < 2 then
 						enemyPiecesHit += 1
 						if enemyPiecesHit == 2 then
-							if hitPiece == (piece.Board[oppColor].Pieces["King"]) then
-								piece:Pin(lastEnemyPiece.Position)
+							if hitPiece == (self.Board:Get(oppColor).Pieces["King"]) then
+								piece:Pin(lastEnemyPiece:Get("Position"))
 								isPinning = true
 							end
 							break
 						elseif enemyPiecesHit == 1 then
-							if hitPiece == (piece.Board[oppColor].Pieces["King"]) then
+							if hitPiece == (self.Board:Get(oppColor).Pieces["King"]) then
 								checking = true
 								local dir = dist > 1 and 1 or -1
-								piece:AddAttackingMove(currentPos+piecePos + (9*(dirX*offset+1)) + (1+offset*dirY))
+								piece:AddAttackingMove(currentPos+piecePos + (9*(dirX*(offset+1))) + ((1+offset)*dirY))
 								break
 							else
 								lastEnemyPiece = hitPiece
