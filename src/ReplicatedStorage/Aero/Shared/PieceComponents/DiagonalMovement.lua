@@ -9,6 +9,8 @@
 
 
 local BoardUtil
+local toInt
+local toVec2
 
 local BaseComponent = require(script.Parent.BaseComponent)
 
@@ -23,27 +25,27 @@ end
 
 function DiagonalMovement:ComputeLegalMoves()
 	local piece = self.Piece
-	local board = piece.Board.Board
-	local piecePos = piece.Position
-	local oppColor = BoardUtil.GetColor(not piece.IsBlack)
+	local board = self.Board:Get("Board")
+	local piecePos = piece:Get("Position")
+	local oppColor = BoardUtil.GetColor(not piece:Get("IsBlack"))
 
-	local distFromLeft = piecePos.X
+	local distFromLeft = BoardUtil.GetX(piecePos)
 	local distFromRight = 8 - distFromLeft
-	local distFromBottom = piecePos.Y	
+	local distFromBottom = BoardUtil.GetY(piecePos)	
 	local distFromTop = 8-distFromBottom
 	
 	local path = {}
 	local isPinning = false
 	local checking = false
 	
-	local function iterateThroughPath(dist,off1,off2)
+	local function iterateThroughPath(dist,dirX,dirY)
 		local piecesHit = 0
 		local enemyPiecesHit = 0 
 		local lastEnemyPiece
 		local lastPieceHit 
 		
 		for offset = 1,dist do
-			local currentPos = piecePos + Vector2.new(offset*off1,offset*off2)
+			local currentPos = piecePos + (9*(dirX*offset)) + (offset*dirY)
 			
 			if piecesHit == 0 then
 				piece:AddLegalMove(currentPos)
@@ -71,7 +73,7 @@ function DiagonalMovement:ComputeLegalMoves()
 							if hitPiece == (piece.Board[oppColor].Pieces["King"]) then
 								checking = true
 								local dir = dist > 1 and 1 or -1
-								piece:AddAttackingMove(currentPos+Vector2.new(dir*off1,dir*off2))
+								piece:AddAttackingMove(currentPos+piecePos + (9*(dirX*offset+1)) + (1+offset*dirY))
 								break
 							else
 								lastEnemyPiece = hitPiece
@@ -111,6 +113,8 @@ end
 
 function DiagonalMovement:Init(framework)
 	BoardUtil = framework.Shared.Utils.BoardUtil
+	toVec2 = BoardUtil.IntToVector2
+	toInt = BoardUtil.Vector2ToInt
 end
 
 

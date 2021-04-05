@@ -43,7 +43,7 @@ end
 function Castling:ComputeLegalMoves()
 	local piece = self.Piece
 	local board = self.Board
-	local currentPos = toInt(piece:Get("Position"))
+	local currentPos = piece:Get("Position")
 
 	if piece:HasTag("King") and piece:Get("CanCastle") then
 		local oppColor = BoardUtil.GetColor(not piece:Get("IsBlack"))
@@ -58,7 +58,7 @@ function Castling:ComputeLegalMoves()
 			--//Check all possibilities
 			if rookQ:HasTag("Rook") and rookQ:Get("IsBlack") == piece:Get("IsBlack") and rookQ:Get("CanCastle") and pathClear then
 				local newKingPos = currentPos - 2
-				local rookPos = toInt(rookQ:Get("Position"))
+				local rookPos = rookQ:Get("Position")
 				local newRookPos = rookPos + 3
 				piece:AddLegalMove(newKingPos,Action.new("Move",currentPos,newKingPos,"Move",rookPos,newRookPos))
 			end
@@ -69,7 +69,7 @@ function Castling:ComputeLegalMoves()
 			--//Check all possibilities
 			if rookK:HasTag("Rook") and rookK:Get("IsBlack") == piece:Get("IsBlack") and rookK:Get("CanCastle") and pathClear then
 				local newKingPos = currentPos + 2
-				local rookPos = toInt(rookQ:Get("Position"))
+				local rookPos = rookQ:Get("Position")
 				local newRookPos = rookPos - 2
 				piece:AddLegalMove(newKingPos,Action.new("Move",currentPos,newKingPos,"Move",rookPos,newRookPos))
 			end

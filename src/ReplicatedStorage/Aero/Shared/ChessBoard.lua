@@ -284,7 +284,7 @@ function ChessBoard:LoadFromFEN(FENString)
 				local isBlack = (char == string.lower(char)) 
 				local color = BoardUtil.GetColor(isBlack)
 
-				local position = Vector2.new(currentFile,currentRank)
+				local position = BoardUtil.Vector2ToInt(currentFile,currentRank)
 				local newPiece = Piece.new(realPiece,position,self,isBlack) 
 				BoardUtil.Get(self.Board,Vector2.new(currentFile,currentRank)).Piece = newPiece
 

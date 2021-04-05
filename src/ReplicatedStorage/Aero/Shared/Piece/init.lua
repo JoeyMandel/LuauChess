@@ -9,6 +9,7 @@
 
 --]]
 local BoardUtil
+local Action
 
 local Piece = {}
 Piece.__index = Piece
@@ -81,6 +82,8 @@ end
 
 function Piece:AddLegalMove(position,moveInfo)
 	local color = self:Get("IsBlack") and "Black" or "White"	
+	moveInfo = moveInfo or Action.new("Move",self:Get("Position"),position)
+
 	BoardUtil.Set(self:Get("LegalMoves"),position,moveInfo)
 	local legalMoves = BoardUtil.Get(self:Get("Board")[color].LegalMoves,position)
 	if legalMoves then
@@ -183,6 +186,7 @@ end
 
 function Piece:Init()
 	BoardUtil = self.Shared.Utils.BoardUtil
+	Action = self.Shared.Action
 end
 
 

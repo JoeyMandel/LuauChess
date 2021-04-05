@@ -19,6 +19,13 @@ function BoardUtil.IsPositionValid(pos)
 	return false
 end
 
+function BoardUtil.GetX(int)
+	return ((int - int%9)/9) + 1
+end
+function BoardUtil.GetY(int)
+	return int%9
+end
+
 function BoardUtil.ANFromVector2(pos)
 	return (numToRank[pos.X]..tostring(pos.Y))
 end
