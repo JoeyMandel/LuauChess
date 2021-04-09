@@ -1,6 +1,3 @@
 {
-  "files.exclude": {
-    "src/_framework/": true,
-    ".vscode": true
-  }
+  "files.exclude": {}
 }
