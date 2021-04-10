@@ -8,6 +8,9 @@
 	
 
 --]]
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
+
+local PieceComponents
 local BoardUtil
 local Action
 
@@ -184,9 +187,10 @@ function Piece:Destroy()
 	self._maid:DoCleaning()
 end
 
-function Piece:Init()
-	BoardUtil = self.Shared.Utils.BoardUtil
-	Action = self.Shared.Action
+function Piece:KnitInit()
+	BoardUtil = require(Knit.Shared.Utils.BoardUtil)
+	Action = require(Knit.Shared.Action)
+	PieceComponents = require(Knit.Shared.Components.PieceComponents)
 end
 
 
