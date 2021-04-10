@@ -37,7 +37,7 @@ end
 
 --//Utils
 function Piece:AddComponent(name,config)
-	self.Components[name] = self.Shared.PieceComponents.new(name,self,(config or {}))
+	self.Components[name] = PieceComponents.new(name,self,(config or {}))
 	self._maid:GiveTask(self.Components[name])
 end
 
