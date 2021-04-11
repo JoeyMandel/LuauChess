@@ -3,6 +3,7 @@
     UnknownParabellum
     Created on March 25, 2021 
 ]]
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 local Players = game:GetService("Players")
 local Maid 
 
@@ -41,8 +42,8 @@ function UIClass:Destroy()
 	self:UnLoad()
 end
 
-function UIClass:Init(framework)
-	Maid = framework.Shared.Utils.Maid
+function UIClass:Init()
+	Maid = require(Knit.Shared.Utils.Maid)
 end
 
 return UIClass

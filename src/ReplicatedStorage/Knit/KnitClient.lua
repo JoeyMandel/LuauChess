@@ -78,11 +78,13 @@ function KnitClient.CreateController(controller)
 		_knit_is_controller = true;
 	})
 	KnitClient.Controllers[controller.Name] = controller
+	warn(("[Knit Client]: Created a new controller: %s"):format(controller.Name))
 	return controller
 end
 
 
 function KnitClient.AddControllers(folder)
+	warn(("[Knit Client]: Adding controllers from folder: %s"):format(folder:GetFullName()))
 	return Loader.LoadChildren(folder)
 end
 

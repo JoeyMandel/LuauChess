@@ -1,6 +1,8 @@
 -- Board
 -- Username
 -- January 18, 2021
+
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -323,16 +325,17 @@ end
 
 --//Basic 
 
-function Board:Init(framework)
-	local _shared = framework.Shared
-	Constants = _shared.Constants
+function Board:Init()
+	local _shared = Knit.Shared
+
+	Constants = require(_shared.Constants)
 	PieceStyles = Constants.PieceStyles
 	Palettes = Constants.Palettes
 
-	Signal = _shared.Utils.Signal
-	Maid = _shared.Utils.Maid
-	BoardUtil = _shared.Utils.BoardUtil
-	Thread = _shared.Utils.Thread
+	Signal = require(_shared.Utils.Signal)
+	Maid = require(_shared.Utils.Maid)
+	BoardUtil = require(_shared.Utils.BoardUtil)
+	Thread = require(_shared.Utils.Thread)
 	
 	PlayerGui = self.Player.PlayerGui 
 	UI = PlayerGui.Game

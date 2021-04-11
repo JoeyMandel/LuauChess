@@ -12,7 +12,6 @@ local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
 local PieceComponents
 local BoardUtil
-local Action
 
 local Piece = {}
 Piece.__index = Piece
@@ -85,7 +84,7 @@ end
 
 function Piece:AddLegalMove(position,moveInfo)
 	local color = self:Get("IsBlack") and "Black" or "White"	
-	moveInfo = moveInfo or Action.new("Move",self:Get("Position"),position)
+	--moveInfo = moveInfo or Action.new("Move",self:Get("Position"),position)
 
 	BoardUtil.Set(self:Get("LegalMoves"),position,moveInfo)
 	local legalMoves = BoardUtil.Get(self:Get("Board")[color].LegalMoves,position)
@@ -158,10 +157,10 @@ function Piece.new(name,pos,board,color)
 			},
 			["Components"] = {},
 			["IsDead"] = false,
-			["_maid"] = Piece.Shared.Utils.Maid.new()
+			["_maid"] = require(Knit.Shared.Utils.Maid).new()
 		}, Piece)
 		
-		Piece.Shared.TagSystem.Include(base)
+		require(Knit.Shared.TagSystem).Include(base)
 		
 		base:AddComponent("GlobalPieceProperties")
 		realPiece = require(mod).new(base)
@@ -187,11 +186,11 @@ function Piece:Destroy()
 	self._maid:DoCleaning()
 end
 
-function Piece:KnitInit()
+function Piece:Init()
 	BoardUtil = require(Knit.Shared.Utils.BoardUtil)
-	Action = require(Knit.Shared.Action)
 	PieceComponents = require(Knit.Shared.Components.PieceComponents)
 end
 
+Piece:Init()
 
 return Piece

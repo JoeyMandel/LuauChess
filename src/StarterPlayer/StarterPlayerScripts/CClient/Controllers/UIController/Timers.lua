@@ -1,6 +1,8 @@
 -- Timers
 -- Username
 -- January 18, 2021
+
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
 
@@ -83,11 +85,11 @@ function Timers:SetConfig(board)
 end
 --//Basic 
 
-function Timers:Init(framework)
-	local _shared = framework.Shared
+function Timers:Init()
+	local _shared = Knit.Shared
 	
-	TimerClass = _shared.Timer
-	Thread = _shared.Utils.Thread
+	TimerClass = require(_shared.Classes.Timer)
+	Thread = require(_shared.Utils.Thread)
 
 	PlayerGui = self.Player.PlayerGui 
 	UI = PlayerGui.Game

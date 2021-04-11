@@ -5,8 +5,8 @@
 ]]
 
 
-
-local UIController = {}
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
+local UIController = Knit.CreateController { Name = "UIController" }
 UIController.UIs = {}
 
 
@@ -20,7 +20,7 @@ function UIController:LerpCubicBezierCurve(time: number,startPos: Vector2,endPos
 end
 
 
-function UIController:Start()
+function UIController:KnitStart()
 	if not _G.GuiLoaded then
 		warn("Waiting for UI to load...")
 	   _G.Loaded:Wait()
@@ -32,7 +32,7 @@ function UIController:Start()
 		self.UIs[name] = require(mod)
 		self.UIs[name]:Init(self)
 	end
-	local board = self.Shared.ChessBoard.new(self.Shared.Constants.Layouts.Start)
+	local board = require(Knit.Shared.Classes.ChessBoard).new(require(Knit.Shared.Constants).Layouts.Start)
 	
 	self.UIs.Timers:SetConfig(board)
 	self.UIs.Board:SetBoard(board)
@@ -43,7 +43,7 @@ function UIController:Start()
 end
 
 
-function UIController:Init()
+function UIController:KnitInit()
 	
 end
 
