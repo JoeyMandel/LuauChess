@@ -1,10 +1,9 @@
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
 local Rodux = require(Knit.Shared.Utils.Rodux)
 
-local Actions = require(script.BoardActions)
 local Reducers = require(script.BoardReducers)
 
-local reducer = Rodux.combineReducers(Reducers)
+local reducer = Rodux.createReducer(nil,Reducers)
 
 local BoardStore = {}
 

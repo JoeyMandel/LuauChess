@@ -12,6 +12,7 @@
 --// Started Rewritting 3/29/2021
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
+local BoardStore
 local Piece
 local Signal
 local Maid
@@ -42,25 +43,23 @@ function ChessBoard.new(state)
 		["Checked"] = Signal.new(),
 		["PieceDestroyed"] = Signal.new(),
 
-		["State"] = {
-			["Board"] =  {},
-			["LastFENStates"] = {},
-			["LastActions"] = {},
+		["Board"] =  {},
+		["LastFENStates"] = {},
+		["LastActions"] = {},
 
-			["WhiteToNextMove"] = true,
-			["MoveNumber"] = 1,
-			["White"] = {
-				["Checking"] = {},
-				["Pieces"] = {},
-				["LegalMoves"] = {},
-				["Attacking"] = {},
-			},
-			["Black"] = {
-				["Checking"] = {},
-				["Pieces"] = {},
-				["LegalMoves"] = {},
-				["Attacking"] = {},
-			},
+		["WhiteToNextMove"] = true,
+		["MoveNumber"] = 1,
+		["White"] = {
+			["Checking"] = {},
+			["Pieces"] = {},
+			["LegalMoves"] = {},
+			["Attacking"] = {},
+		},
+		["Black"] = {
+			["Checking"] = {},
+			["Pieces"] = {},
+			["LegalMoves"] = {},
+			["Attacking"] = {},
 		},
 		["_maid"] = Maid.new()
 	}, ChessBoard)
@@ -80,7 +79,9 @@ function ChessBoard.new(state)
 	if state then
 		self:LoadFromFEN(state)
 	end
-	self:UpdateMoves()
+	self.Board = BoardStore.new(self.Board)
+	warn(self.Board)
+--	self:UpdateMoves()
 	return self
 end
 
@@ -111,21 +112,21 @@ end
 function ChessBoard:AfterUpdate(action)
 	local pos1 = action[1].Orig
 	local pos2 = action[1].Target
-	local piece = self.State.Board[pos1]
+	local piece = self.Board[pos1]
 
 	print("[Client Board]: Piece Moved: "..BoardUtil.GetColor(piece.IsBlack).." "..piece.Type.." : "
 		..BoardUtil.ANFromVector2(pos1).." -> "..BoardUtil.ANFromVector2(pos2))	
 
 	self.WhiteToNextMove = not self.WhiteToNextMove
 	self.MoveNumber += 0.5
-	self.State = "Idle"
+	self = "Idle"
 	self:UpdateMoves()
 	
 	self.UpdateProcessed:Fire()
 end
 
 function ChessBoard:CleanState()
-	local state = self.State
+	local state = self
 	--// Clear legal moves, attacking and checking to prepare for next update
 	-- I imagine the board cleaning out all the gunk
 	local function clean(color)
@@ -147,8 +148,8 @@ function ChessBoard:CleanState()
 			end
 		end
 	end
-	clean(self.State.White)
-	clean(self.State.Black)
+	clean(self.White)
+	clean(self.Black)
 end
 --// Other functions
 
@@ -164,7 +165,7 @@ end
 		6. Fires AfterMoved
 ]]
 function ChessBoard:Move(pos1,pos2,config)
-	local board = self.State.Board
+	local board = self.Board
 	local piece =  board[pos1].Piece
 	local moveInfo = piece.LegalMoves[pos2]
 
@@ -207,7 +208,7 @@ function ChessBoard:Move(pos1,pos2,config)
 
 		self.WhiteToNextMove = not self.WhiteToNextMove
 		self.MoveNumber += 0.5
-		self.State = "Idle"
+		self = "Idle"
 		self:UpdateMoves()
 		self.AfterMoved:Fire(moveInfo)
 	end
@@ -272,10 +273,10 @@ function ChessBoard:LoadFromFEN(FENString)
 				local color = BoardUtil.GetColor(isBlack)
 
 				local position = BoardUtil.Vector2ToInt(currentFile,currentRank)
-				local newPiece = Piece.new(realPiece,position,self,isBlack) 
+				local newPiece = realPiece--Piece.new(realPiece,position,self,isBlack) 
 				BoardUtil.Get(self.Board,Vector2.new(currentFile,currentRank)).Piece = newPiece
 
-				if newPiece:HasTag("King") then
+				if newPiece == "King" then--newPiece:HasTag("King") then
 					self[color].Pieces["King"] = newPiece
 				else
 					table.insert((self[color].Pieces),newPiece)
@@ -313,10 +314,10 @@ function ChessBoard:SetBoardState(color)
 end
 
 function ChessBoard:SetState(newState)
-	local currentVal = soundHierarchy[self.State]
+	local currentVal = soundHierarchy[self]
 	local newVal = soundHierarchy[newState] or 0
 	if newVal >= currentVal then
-		self.State = newState
+		self = newState
 	end
 end
 
@@ -366,14 +367,18 @@ function ChessBoard:CheckIfIsLegalMove(pos1,pos2)
 	end
 	return false
 end
+
 function ChessBoard:Init()
-	local shared = Knit.Shared
-	Signal = require(shared.Utils.Signal)
-	Maid = require(shared.Utils.Maid)
-	Tile = require(shared.Tile)
-	StringUtil = require(shared.Utils.StringUtil)
-	Piece = require(shared.Piece)
-	BoardUtil = require(shared.Utils.BoardUtil)
+	local _shared = Knit.Shared
+	Signal = require(_shared.Utils.Signal)
+	Maid = require(_shared.Utils.Maid)
+	Tile = require(_shared.Classes.Tile)
+	StringUtil = require(_shared.Utils.StringUtil)
+	Piece = require(_shared.Classes.Piece)
+	BoardUtil = require(_shared.Utils.BoardUtil)
+	BoardStore = require(_shared.State.BoardStore)
 end
+
+ChessBoard:Init()
 
 return ChessBoard

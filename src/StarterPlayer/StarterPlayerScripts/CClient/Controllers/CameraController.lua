@@ -6,12 +6,12 @@
 	
 
 --]]
-
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local CurrentCamera = workspace.CurrentCamera
 
-local CameraController = {}
+local CameraController = Knit.CreateController({Name = "CameraController"})
 CameraController.Friction = 0.999 --// in demos: y\ =\ \left(0.95^{60\cdot x}\cdot\ 1\right)
 CameraController.Force = Vector2.new()
 
@@ -48,7 +48,7 @@ function CameraController:ApplySpeed(vector,pSpeed)
 	self.Force = self.Force + (normalizeVector(vector) * Vector2.new(rSpeed,rSpeed))
 end
 
-function CameraController:Start()
+function CameraController:KnitStart()
 	--//This will currently just move the camera based on 
 	CurrentCamera.CameraType = Enum.CameraType.Scriptable
 	CurrentCamera.CFrame = CFrame.new()

@@ -16,48 +16,44 @@ local function shallowCopyState(oldState)
 end
 
 
-function ReducerFuncs.MovePiece(state, action)
-    if action.type == "Move" then
-        local newState = shallowCopyState(state)
+function ReducerFuncs.Move(state, action)
+    local newState = shallowCopyState(state)
 
-        local orig = action.orig
-        local target = action.target
+    local orig = action.orig
+    local target = action.target
 
-        local origTile = newState[orig]
-        local targetTile = newState[target]
+    local origTile = newState[orig]
+    local targetTile = newState[target]
 
-        local origPiece = origTile.Piece
-        local targetPiece = targetTile.Piece
-        
-        if targetPiece then
-            newState = ReducerFuncs.DestroyPiece(newState,BoardActions.createDestroy(target))
-        end
-
-        origTile.Piece = nil
-        targetTile.Piece = origPiece
-
-        return newState
+    local origPiece = origTile.Piece
+    local targetPiece = targetTile.Piece
+    
+    if targetPiece then
+        newState = ReducerFuncs.Destroy(newState,BoardActions.createDestroy(target))
     end
+
+    origTile.Piece = nil
+    targetTile.Piece = origPiece
+
+    return newState
 end
 
-function ReducerFuncs.DestroyPiece(state, action)
-    if action.type == "Destroy" then
-        local newState = shallowCopyState(state)
+function ReducerFuncs.Destroy(state, action)
+    local newState = shallowCopyState(state)
 
-        local target = action.target
-        local targetTile  = newState[target]
+    local target = action.target
+    local targetTile  = newState[target]
 
-        targetTile.Piece:Destroy()
-        targetTile.Piece = nil
+    targetTile.Piece:Destroy()
+    targetTile.Piece = nil
 
-        return newState
-    end
+    return newState
 end
 
-function ReducerFuncs.CreatePiece(state, action)
+function ReducerFuncs.Create(state, action)
     if action.type == "Create" then 
         error("Create piece is not finished yet!")
     end
 end
 
-return BoardActions
+return ReducerFuncs
