@@ -1,29 +1,31 @@
 --Must not require BoardReducers!
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
-local Rodux = require(Knit.Shared.Utils.Rodux)
+local Rodux = require(Knit.Shared.Lib.Rodux)
 
 local BoardActions = {}
 
-function BoardActions.createMove(orig,target)
+function BoardActions.createMove(config)
     return {
         ["type"] = "Move",
-        ["orig"] = orig,
-        ["target"] = target
+        ["orig"] = config.Orig,
+        ["target"] = config.Target
     }
 end
 
-function BoardActions.createDestroy(target)
+function BoardActions.createDestroy(config)
     return {
         ["type"] = "Destroy",
-        ["target"] = target
+        ["target"] = config.Target
     }
 end
 
-function BoardActions.createCreate(pieceType,target)
+function BoardActions.createCreate(config)
     return {
         ["type"] = "Destroy",
-        ["pieceType"] = pieceType,
-        ["target"] = target,
+        ["target"] = config.Target,
+        ["pieceType"] = config.Type,
+        ["color"] = config.Color,
+        ["board"] = config.Board,
     }
 end
 

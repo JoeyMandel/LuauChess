@@ -111,7 +111,7 @@ function DiagonalMovement.new(piece,config)
 end
 
 function DiagonalMovement:Init(framework)
-	BoardUtil = framework.Shared.Utils.BoardUtil
+	BoardUtil = framework.Shared.Lib.BoardUtil
 	toVec2 = BoardUtil.IntToVector2
 	toInt = BoardUtil.Vector2ToInt
 end

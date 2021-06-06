@@ -51,7 +51,7 @@ function KnightMovement.new(piece,config)
 end
 
 function  KnightMovement.new(framework)
-	BoardUtil = framework.Shared.Utils.BoardUtil
+	BoardUtil = framework.Shared.Lib.BoardUtil
 end
 
 

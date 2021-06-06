@@ -44,7 +44,7 @@ function Timers:StartCounting(timeLimitation, startingIsBlack)
 	self.BlackTimer = TimerClass.new(timeLimitation)
 	self.NextIsBlack = startingIsBlack
 	
-	self._maid["BoardChanged"] = self.Board.AfterMoved:Connect(function()
+	self.__maid["BoardChanged"] = self.Board.AfterMoved:Connect(function()
 		local currentTimer = self.NextIsBlack and self.BlackTimer or self.WhiteTimer
 		local lastTimer = self.NextIsBlack and self.WhiteTimer or self.BlackTimer
 		self.NextIsBlack = not self.NextIsBlack
@@ -56,8 +56,8 @@ function Timers:StartCounting(timeLimitation, startingIsBlack)
 		elseif currentTimer.Status == "Paused" then
 			currentTimer:UnPause()
 		end
-		self._maid["OnTick"] = nil
-		self._maid["OnTick"] = currentTimer.OnTick:Connect(function(timePassed)
+		self.__maid["OnTick"] = nil
+		self.__maid["OnTick"] = currentTimer.OnTick:Connect(function(timePassed)
 			self:UpdateUI(self.NextIsBlack, timeLimitation - timePassed)
 		end)		
 	end)
@@ -89,7 +89,7 @@ function Timers:Init()
 	local _shared = Knit.Shared
 	
 	TimerClass = require(_shared.Classes.Timer)
-	Thread = require(_shared.Utils.Thread)
+	Thread = require(_shared.Lib.Thread)
 
 	PlayerGui = self.Player.PlayerGui 
 	UI = PlayerGui.Game

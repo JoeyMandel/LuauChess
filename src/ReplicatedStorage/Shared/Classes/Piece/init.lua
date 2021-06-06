@@ -37,7 +37,7 @@ end
 --//Utils
 function Piece:AddComponent(name,config)
 	self.Components[name] = PieceComponents.new(name,self,(config or {}))
-	self._maid:GiveTask(self.Components[name])
+	self.__maid:GiveTask(self.Components[name])
 end
 
 function Piece:RemoveComponent(name)
@@ -139,9 +139,14 @@ function Piece:UnPin(piece)
 	piece:Get("PinnedBy")[self] = nil
 end
 --//General
-function Piece.new(name,pos,board,color)
+function Piece.new(config)
 	local realPiece
-	local mod = script:FindFirstChild(name)
+	local type = config.Type
+	local pos = config.Position
+	local board = config.Board
+	local color = config.Color
+
+	local mod = script:FindFirstChild(type)
 	if mod then
 		local base = setmetatable({
 			["State"] = { --// State is anything variable and not related to the very basic functions of a piece
@@ -157,7 +162,7 @@ function Piece.new(name,pos,board,color)
 			},
 			["Components"] = {},
 			["IsDead"] = false,
-			["_maid"] = require(Knit.Shared.Utils.Maid).new()
+			["__maid"] = require(Knit.Shared.Lib.Maid).new()
 		}, Piece)
 		
 		require(Knit.Shared.TagSystem).Include(base)
@@ -183,11 +188,11 @@ function Piece:Destroy()
 	
 	self:RemovePinning()
 	self.IsDead = true
-	self._maid:DoCleaning()
+	self.__maid:DoCleaning()
 end
 
 function Piece:Init()
-	BoardUtil = require(Knit.Shared.Utils.BoardUtil)
+	BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 	PieceComponents = require(Knit.Shared.Components.PieceComponents)
 end
 

@@ -19,7 +19,7 @@ function BaseComponent.new(piece)
 		["Piece"] = piece,
 		["Board"] = piece:Get("Board"),
 		["Position"] = piece.Position,
-		["_maid"] = framework.Shared.Utils.Maid.new()
+		["__maid"] = framework.Shared.Lib.Maid.new()
 	}, BaseComponent)
 	framework.Shared.TagSystem.Include(self)
 	
@@ -27,7 +27,7 @@ function BaseComponent.new(piece)
 end
 
 function BaseComponent:Destroy()
-	self._maid:DoCleaning()
+	self.__maid:DoCleaning()
 end
 
 return BaseComponent

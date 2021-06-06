@@ -45,7 +45,7 @@ function KingMovement.new(piece,config)
 end
 
 function KingMovement:Init(framework)
-	BoardUtil = framework.Shared.Utils.BoardUtil
+	BoardUtil = framework.Shared.Lib.BoardUtil
 	toInt = BoardUtil.Vector2ToInt
 end
 

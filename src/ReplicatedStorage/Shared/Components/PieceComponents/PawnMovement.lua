@@ -28,8 +28,8 @@ function PawnMovement:BeforeUpdate(changes)
 		local doubleMoved = (isBlack and BoardUtil:GetY(newPos) == (startingRow - 2)) or BoardUtil:GetY(newPos) == (startingRow  + 2)
 		if doubleMoved then
 			self.Piece:Set("EnPassent",true)
-			self._maid["Moved"] = self.Board.BeforeMoved:Connect(function()
-				self._maid["Moved"] = nil
+			self.__maid["Moved"] = self.Board.BeforeMoved:Connect(function()
+				self.__maid["Moved"] = nil
 				self.Piece:Set("EnPassent", false)
 			end)
 		end
@@ -110,7 +110,7 @@ end
 
 
 function PawnMovement:Init(framework)
-	BoardUtil = self.Shared.Utils.BoardUtil
+	BoardUtil = self.Shared.Lib.BoardUtil
 	toInt = BoardUtil.Vector2ToInt
 	toVec2 = BoardUtil.IntToVector2
 

@@ -24,7 +24,7 @@ end
 function UIClass:UnLoad()
     if self.Loaded then
 		self.Loaded = false 
-		self._maid:DoCleaning()
+		self.__maid:DoCleaning()
     end
 end
  
@@ -33,7 +33,7 @@ function UIClass.new()
 		["Name"] = "BaseClass",
 		["Player"] = Players.LocalPlayer,
 		["Loaded"] = false,
-        ["_maid"] = Maid.new(),        
+        ["__maid"] = Maid.new(),        
     },UIClass)
     return self
 end
@@ -43,7 +43,7 @@ function UIClass:Destroy()
 end
 
 function UIClass:Init()
-	Maid = require(Knit.Shared.Utils.Maid)
+	Maid = require(Knit.Shared.Lib.Maid)
 end
 
 return UIClass

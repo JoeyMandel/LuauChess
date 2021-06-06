@@ -74,7 +74,7 @@ function GlobalPieceProperties.new(piece,config)
 end
 
 function GlobalPieceProperties:Init(framework)
-	BoardUtil = framework.Shared.Utils.BoardUtil
+	BoardUtil = framework.Shared.Lib.BoardUtil
 end
 
 

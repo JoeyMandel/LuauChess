@@ -1,7 +1,9 @@
 -- Note this module requires BoardActions first so BoardActions must not require BoardReducers when it starts
-
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
-local Rodux = require(Knit.Shared.Utils.Rodux)
+
+local Piece = require(Knit.Shared.Classes.Piece)
+
+local Rodux = require(Knit.Shared.Lib.Rodux)
 local BoardActions = require(script.Parent.BoardActions)
 
 local ReducerFuncs = {}
@@ -51,9 +53,21 @@ function ReducerFuncs.Destroy(state, action)
 end
 
 function ReducerFuncs.Create(state, action)
-    if action.type == "Create" then 
-        error("Create piece is not finished yet!")
-    end
+    local newState = shallowCopyState(state)
+
+    local target = action.target
+    local targetTile  = newState[target]
+
+    local newPiece = Piece.new({
+        ["pieceType"] = action.type,
+        ["Position"] = action.target,
+        ["Board"] = action.board,
+        ["Color"] = action.Color,
+    })
+
+    targetTile.Piece = newPiece
+
+    return newState
 end
 
 return ReducerFuncs

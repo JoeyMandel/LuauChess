@@ -262,8 +262,8 @@ function Board:PickUpPiece(tile,image)
 		image.Visible = true
 		tempPiece.Visible = false
 		self.HoldingPiece = false
-		self._maid.Movement = nil
-		self._maid.NewInput = nil
+		self.__maid.Movement = nil
+		self.__maid.NewInput = nil
 		self.CanPickUp = true
 	end
 	if not self.OrderedHighlighted[tile.Position.X*8 + tile.Position.Y] then
@@ -276,10 +276,10 @@ function Board:PickUpPiece(tile,image)
 	
 	setTempPos()
 	self:ShowLegalMoves(legalMoves)
-	self._maid.Movement = Thread.DelayRepeat(0.01,function() --//Updates every frame
+	self.__maid.Movement = Thread.DelayRepeat(0.01,function() --//Updates every frame
 		setTempPos()
 	end)
-	self._maid.NewInput = UserInputService.InputEnded:Connect(function(input,gpe)
+	self.__maid.NewInput = UserInputService.InputEnded:Connect(function(input,gpe)
 		local inputType = input.UserInputType
 		if (inputType == Enum.UserInputType.MouseButton2) then
 			destroy()
@@ -305,7 +305,7 @@ function Board:Activate()
 	for pos,tile in pairs(board) do
 		local currentPos = BoardUtil.IntToVector2(pos)
 		local visTile = VisBoard[currentPos.X][currentPos.Y]
-		self._maid:GiveTask(visTile.Piece.MouseButton1Down:Connect(function()
+		self.__maid:GiveTask(visTile.Piece.MouseButton1Down:Connect(function()
 			if self.CanPickUp then
 				self:PickUpPiece(tile,visTile.Piece)
 			end
@@ -332,10 +332,10 @@ function Board:Init()
 	PieceStyles = Constants.PieceStyles
 	Palettes = Constants.Palettes
 
-	Signal = require(_shared.Utils.Signal)
-	Maid = require(_shared.Utils.Maid)
-	BoardUtil = require(_shared.Utils.BoardUtil)
-	Thread = require(_shared.Utils.Thread)
+	Signal = require(_shared.Lib.Signal)
+	Maid = require(_shared.Lib.Maid)
+	BoardUtil = require(_shared.Lib.BoardUtil)
+	Thread = require(_shared.Lib.Thread)
 	
 	PlayerGui = self.Player.PlayerGui 
 	UI = PlayerGui.Game

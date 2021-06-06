@@ -153,7 +153,7 @@ function Component.new(tag, class, renderPriority)
 	self.Added = Signal.new()
 	self.Removed = Signal.new()
 
-	self._maid = Maid.new()
+	self.__maid = Maid.new()
 	self._lifecycleMaid = Maid.new()
 	self._tag = tag
 	self._class = class
@@ -168,17 +168,17 @@ function Component.new(tag, class, renderPriority)
 	self._lifecycle = false
 	self._nextId = 0
 
-	self._maid:GiveTask(CollectionService:GetInstanceAddedSignal(tag):Connect(function(instance)
+	self.__maid:GiveTask(CollectionService:GetInstanceAddedSignal(tag):Connect(function(instance)
 		if (IsDescendantOfWhitelist(instance)) then
 			self:_instanceAdded(instance)
 		end
 	end))
 
-	self._maid:GiveTask(CollectionService:GetInstanceRemovedSignal(tag):Connect(function(instance)
+	self.__maid:GiveTask(CollectionService:GetInstanceRemovedSignal(tag):Connect(function(instance)
 		self:_instanceRemoved(instance)
 	end))
 
-	self._maid:GiveTask(self._lifecycleMaid)
+	self.__maid:GiveTask(self._lifecycleMaid)
 
 	do
 		local b = Instance.new("BindableEvent")
@@ -195,7 +195,7 @@ function Component.new(tag, class, renderPriority)
 	end
 
 	componentsByTag[tag] = self
-	self._maid:GiveTask(function()
+	self.__maid:GiveTask(function()
 		componentsByTag[tag] = nil
 	end)
 
@@ -355,7 +355,7 @@ end
 
 
 function Component:Destroy()
-	self._maid:Destroy()
+	self.__maid:Destroy()
 end
 
 

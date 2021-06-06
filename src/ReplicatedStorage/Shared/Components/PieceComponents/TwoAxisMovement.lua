@@ -112,6 +112,6 @@ function TwoAxisMovement.new(piece,config)
 end
 
 function TwoAxisMovement:Init(framework)
-	BoardUtil = framework.Shared.Utils.BoardUtil
+	BoardUtil = framework.Shared.Lib.BoardUtil
 end
 return TwoAxisMovement

@@ -112,7 +112,7 @@ function Castling.new(piece)
 end
 
 function Castling:Init(framework)
-	BoardUtil = framework.Shared.Utils.BoardUtil
+	BoardUtil = framework.Shared.Lib.BoardUtil
 	toInt = BoardUtil.Vector2ToInt
 	Action = self.Shared.Action
 end

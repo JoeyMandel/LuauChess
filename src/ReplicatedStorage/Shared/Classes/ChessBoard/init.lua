@@ -61,7 +61,7 @@ function ChessBoard.new(state)
 			["LegalMoves"] = {},
 			["Attacking"] = {},
 		},
-		["_maid"] = Maid.new()
+		["__maid"] = Maid.new()
 	}, ChessBoard)
 
 	for file = 1,8 do --// Set up board 
@@ -89,10 +89,10 @@ function ChessBoard:Initiate()
 	
 end
 
-function ChessBoard:Update(action)
-	self:PreUpdate(action)
-	self:ProcessUpdate(action)
-	self:AfterUpdate(action)
+function ChessBoard:Step(actions)
+	self:PreStep(actions)
+	self:ProcessStep(actions)
+	self:PostStep(actions)
 end
 
 function ChessBoard:Destroy()
@@ -100,16 +100,16 @@ function ChessBoard:Destroy()
 end
 
 --//Update sub-functions
-function ChessBoard:PreUpdate(action)
+function ChessBoard:PreStep(actions)
 	self.UpdateReceived:Fire()
 	self:CleanState()
 end
 
-function ChessBoard:ProcessUpdate(action)
+function ChessBoard:ProcessStep(actions)
 
 end
 
-function ChessBoard:AfterUpdate(action)
+function ChessBoard:PostStep(action)
 	local pos1 = action[1].Orig
 	local pos2 = action[1].Target
 	local piece = self.Board[pos1]
@@ -370,12 +370,12 @@ end
 
 function ChessBoard:Init()
 	local _shared = Knit.Shared
-	Signal = require(_shared.Utils.Signal)
-	Maid = require(_shared.Utils.Maid)
+	Signal = require(_shared.Lib.Signal)
+	Maid = require(_shared.Lib.Maid)
 	Tile = require(_shared.Classes.Tile)
-	StringUtil = require(_shared.Utils.StringUtil)
+	StringUtil = require(_shared.Lib.StringUtil)
 	Piece = require(_shared.Classes.Piece)
-	BoardUtil = require(_shared.Utils.BoardUtil)
+	BoardUtil = require(_shared.Lib.BoardUtil)
 	BoardStore = require(_shared.State.BoardStore)
 end
 

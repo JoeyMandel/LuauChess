@@ -23,12 +23,12 @@ Streamable.__index = Streamable
 
 function Streamable.new(parent, childName)
 	local self = setmetatable({}, Streamable)
-	self._maid = Maid.new()
-	self._shown = Signal.new(self._maid)
+	self.__maid = Maid.new()
+	self._shown = Signal.new(self.__maid)
 	self._shownMaid = Maid.new()
-	self._maid:GiveTask(self._shownMaid)
+	self.__maid:GiveTask(self._shownMaid)
 	self.Instance = parent:FindFirstChild(childName)
-	self._maid:GiveTask(parent.ChildAdded:Connect(function(child)
+	self.__maid:GiveTask(parent.ChildAdded:Connect(function(child)
 		if (child.Name == childName and not self.Instance) then
 			self.Instance = child
 			self._shown:Fire(child, self._shownMaid)
@@ -55,7 +55,7 @@ end
 
 
 function Streamable:Destroy()
-	self._maid:Destroy()
+	self.__maid:Destroy()
 end
 
 

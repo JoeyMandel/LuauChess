@@ -40,7 +40,7 @@ end
 function Timer:Start(precision)
 	if self:SetStatus("Active") then
 		self.StartTime = self.StartTime or tick()
-		self._maid["Thread"] = Thread.DelayRepeat((precision or 0.1),function()
+		self.__maid["Thread"] = Thread.DelayRepeat((precision or 0.1),function()
 			self.ElapsedTime = (tick() - self.StartTime) - self.Offset
 			self.OnTick:Fire(self.ElapsedTime)
 			if self.ElapsedTime >= self.Length then
@@ -56,7 +56,7 @@ end
 
 function Timer:Pause()
 	if self:SetStatus("Paused") then
-		self._maid["Thread"] = nil
+		self.__maid["Thread"] = nil
 		self.PauseTime = tick()
 	end
 end
@@ -91,23 +91,23 @@ function Timer.new(length)
 		["Status"] = "Inactive",
 		["OnTick"] = Signal.new(),
 		["OnEnd"] = Signal.new(),
-		["_maid"] = Maid.new()
+		["__maid"] = Maid.new()
 	}, Timer)
 	
-	self._maid["OnTick"] = self.OnTick
-	self._maid["OnEnd"] = self.OnEnd
+	self.__maid["OnTick"] = self.OnTick
+	self.__maid["OnEnd"] = self.OnEnd
 	
 	return self
 end
 
 function Timer:Destroy()
 	self.OnEnd:Fire()
-	self._maid:DoCleaning()
+	self.__maid:DoCleaning()
 end
 
 function Timer:Init()
 	local _shared = self.Shared
-	local utils = _shared.Utils
+	local utils = _shared.Lib
 	
 	Maid = utils.Maid
 	Thread = utils.Thread
