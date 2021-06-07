@@ -2,6 +2,7 @@
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
 local Piece = require(Knit.Shared.Classes.Piece)
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 
 local Rodux = require(Knit.Shared.Lib.Rodux)
 local BoardActions = require(script.Parent.BoardActions)
@@ -43,8 +44,16 @@ end
 function ReducerFuncs.Destroy(state, action)
     local newState = shallowCopyState(state)
 
+    local boardObject = newState.Board
+
     local target = action.target
     local targetTile  = newState[target]
+
+    
+    table.remove(boardObject.Pieces, BoardUtil.GetPieceIndexFromArray(boardObject.Pieces, targetTile.Piece))
+
+    local colorPieces = boardObject[BoardUtil.GetColor(Piece.IsBlack)].Pieces
+    table.remove(colorPieces, BoardUtil.GetPieceIndexFromArray(colorPieces, targetTile.Piece))
 
     targetTile.Piece:Destroy()
     targetTile.Piece = nil
@@ -54,18 +63,22 @@ end
 
 function ReducerFuncs.Create(state, action)
     local newState = shallowCopyState(state)
-
+    
+    local boardObject = newState.Board
     local target = action.target
     local targetTile  = newState[target]
 
     local newPiece = Piece.new({
         ["pieceType"] = action.type,
         ["Position"] = action.target,
-        ["Board"] = action.board,
+        ["Board"] = boardObject,
         ["Color"] = action.Color,
     })
 
     targetTile.Piece = newPiece
+
+    table.insert(boardObject.Pieces, newPiece)
+    table.insert(boardObject[BoardUtil.GetColor(action.Color)].Pieces, newPiece)
 
     return newState
 end

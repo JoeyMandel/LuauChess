@@ -43,12 +43,14 @@ function ChessBoard.new(state)
 		["Checked"] = Signal.new(),
 		["PieceDestroyed"] = Signal.new(),
 
-		["Board"] =  {},
+		["Board"] =  nil,
 		["LastFENStates"] = {},
 		["LastActions"] = {},
 
 		["WhiteToNextMove"] = true,
 		["MoveNumber"] = 1,
+
+		["Pieces"] = {},
 		["White"] = {
 			["Checking"] = {},
 			["Pieces"] = {},
@@ -64,18 +66,10 @@ function ChessBoard.new(state)
 		["__maid"] = Maid.new()
 	}, ChessBoard)
 
-	for file = 1,8 do --// Set up board 
-		local isBlack = (file%2 ~= 0)
-		for rank = 1,8 do
-			local tile = Tile.new(Vector2.new(file,rank))
-			tile.IsDark = isBlack
-			BoardUtil.Set(self.Board,tile.Position,tile)
-			BoardUtil.Set(self.Black.LegalMoves,tile.Position,{})
-			BoardUtil.Set(self.White.LegalMoves,tile.Position,{})
+	self.Board = BoardStore.new({
+		["Board"] = self
+	})
 
-			isBlack = not isBlack
-		end
-	end	
 	if state then
 		self:LoadFromFEN(state)
 	end
@@ -106,7 +100,9 @@ function ChessBoard:PreStep(actions)
 end
 
 function ChessBoard:ProcessStep(actions)
-
+	for _, action in ipairs(actions) do
+		self.Board:dispatch(action)
+	end
 end
 
 function ChessBoard:PostStep(action)
@@ -125,32 +121,16 @@ function ChessBoard:PostStep(action)
 	self.UpdateProcessed:Fire()
 end
 
-function ChessBoard:CleanState()
-	local state = self
-	--// Clear legal moves, attacking and checking to prepare for next update
-	-- I imagine the board cleaning out all the gunk
-	local function clean(color)
-		for name,tbl in pairs(color) do
-			if name ~= "Pieces" then
-				local checking = (name == "Checking")
-				local legalMoves = (name == "LegalMoves")
-				local attacking = (name == "Attacking")
-	
-				for index,val in pairs(tbl) do
-					if checking or attacking then
-						tbl[index] = nil
-					elseif legalMoves then
-						for i, _ in pairs(tbl[index]) do
-							val[i] = nil
-						end
-					end
-				end
-			end
-		end
+function ChessBoard:Move(piecePos, targetPos, input)
+	local board = self.Board:getState()
+	local piece = BoardUtil.Get(board, piecePos)
+
+	if piece and self:IsLegalMove(piecePos, targetPos) and (not piece.IsBlack == self.WhiteToNextMove) then
+		local actions = piece:GetActions(targetPos, input)
+		self:Step(actions)
 	end
-	clean(self.White)
-	clean(self.Black)
 end
+
 --// Other functions
 
 --[[
@@ -353,14 +333,10 @@ function ChessBoard:UpdateMoves()
 	print("[Client Board]: All Legal Moves Updated")	
 end
 
-function ChessBoard:CheckIfIsLegalMove(pos1,pos2)
+function ChessBoard:IsLegalMove(pos1,pos2)
 	local board = self.Board
 	local piece =  BoardUtil.Get(board,pos1).Piece
 
-	if (piece.MoveNum ~= self.MoveNumber) then
-		warn(self.MoveNumber)
-		piece:ComputeLegalMoves()
-	end
 	local moveInfo = BoardUtil.Get(piece.LegalMoves,pos2)
 	if moveInfo then
 		return true

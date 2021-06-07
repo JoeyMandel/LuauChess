@@ -10,6 +10,8 @@
 --]]
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
+local HttpService = game:GetService("HttpService")
+
 local PieceComponents
 local BoardUtil
 
@@ -160,6 +162,7 @@ function Piece.new(config)
 				["IsBlack"] = color,
 				["Board"] = board,
 			},
+			["PieceId"] = HttpService:GenerateGUID(false),
 			["Components"] = {},
 			["IsDead"] = false,
 			["__maid"] = require(Knit.Shared.Lib.Maid).new()

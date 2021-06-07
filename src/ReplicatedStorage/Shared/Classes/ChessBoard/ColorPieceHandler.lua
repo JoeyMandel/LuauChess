@@ -1,6 +1,6 @@
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
-local BoardUtil = require(Knit.Shared.)
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 
 local ColorPieceHandler = {}
 ColorPieceHandler.__index = ColorPieceHandler
@@ -17,13 +17,21 @@ function ColorPieceHandler.new()
     return self
 end
 
-function ColorPieceHandler:IsAttacking(color,pos)
-	local attacking = self[color].Attacking
+function ColorPieceHandler:IsAttacking(pos)
+	local attacking = self.Attacking
 	return BoardUtil.Get(attacking,pos)
 end
 
 function ColorPieceHandler:GetPiecesOfType(type)
-    
+    local piecesOfType = {}
+
+    for _, piece in pairs(self.Pieces) do
+        if piece:HasTag(type) then
+            table.insert(piecesOfType, piece)
+        end
+    end
+
+    return piecesOfType
 end
 
 function ColorPieceHandler:CleanForStep()

@@ -25,7 +25,6 @@ function BoardActions.createCreate(config)
         ["target"] = config.Target,
         ["pieceType"] = config.Type,
         ["color"] = config.Color,
-        ["board"] = config.Board,
     }
 end
 

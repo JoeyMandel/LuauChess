@@ -45,6 +45,15 @@ function BoardUtil.GetColor(isBlack)
 	return isBlack and "Black" or "White"
 end
 
+function BoardUtil.GetPieceIndexFromArray(array, piece)
+	for index, otherPiece in pairs(array) do
+		if otherPiece.PieceId == piece.PieceId then
+			return index
+		end
+	end
+	return 0
+end
+
 function BoardUtil.Get(board,pos)
 	if BoardUtil.IsPositionValid(pos) then
 		return board[BoardUtil.Vector2ToInt(pos)]

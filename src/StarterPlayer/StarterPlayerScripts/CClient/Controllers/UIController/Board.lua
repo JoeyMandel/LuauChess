@@ -289,7 +289,7 @@ function Board:PickUpPiece(tile,image)
 			local newTile = self:GetTargetTile(tempPiece.AbsolutePosition+offeset)
 			destroy()
 			if newTile then
-				local canMove = self.Board:CheckIfIsLegalMove(tile.Position,newTile.Position)
+				local canMove = self.Board:IsLegalMove(tile.Position,newTile.Position)
 				if canMove then
 					self.Board:Move(tile.Position,newTile.Position)
 				end
