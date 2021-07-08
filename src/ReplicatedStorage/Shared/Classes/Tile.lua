@@ -18,6 +18,7 @@ Tile.__index = Tile
 function Tile.new(position)
 	
 	local self = setmetatable({
+		["Class"] = "Tile",
 		["Position"] = position,
 		["File"] = numToFile[position.X],
 		["Rank"] = position.Y,

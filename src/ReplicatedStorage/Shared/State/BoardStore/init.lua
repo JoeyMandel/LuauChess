@@ -11,7 +11,8 @@ local reducer = Rodux.createReducer(nil,Reducers)
 
 local BoardStore = {}
 
-function BoardStore.new(initState)
+function BoardStore.new(board)
+	local initState = {}
     for file = 1,8 do --// Set up board 
 		local isBlack = (file%2 ~= 0)
 		for rank = 1,8 do
@@ -22,7 +23,7 @@ function BoardStore.new(initState)
 			isBlack = not isBlack
 		end
 	end	
-
+	initState.Board = board
     return Rodux.Store.new(reducer,initState)
 end
 

@@ -47,11 +47,31 @@ end
 
 function BoardUtil.GetPieceIndexFromArray(array, piece)
 	for index, otherPiece in pairs(array) do
-		if otherPiece.PieceId == piece.PieceId then
+		if otherPiece.Id == piece.Id then
 			return index
 		end
 	end
 	return 0
+end
+
+function BoardUtil.FireRay(board, orig, target, collisionCheck)
+	local collisions = {}
+
+	local delta_x = target.X - orig.X
+	local delta_y = target.Y - orig.Y
+	local slope = delta_y/delta_x
+	
+	for x = 1, delta_x do
+		local y = math.floor(x * slope)
+		local currentPosition = Vector2.new(orig.X + x, orig.Y +  y)
+		local value = board[BoardUtil.Vector2ToInt(currentPosition)]
+
+		if collisionCheck(value) then
+			table.insert(collisions, value)
+		end
+	end
+
+	return collisions
 end
 
 function BoardUtil.Get(board,pos)
@@ -65,6 +85,7 @@ function BoardUtil.Set(board,pos,val)
 		board[BoardUtil.Vector2ToInt(pos)] = val
 	end
 end
+
 
 function BoardUtil.Create()
 	return BoardUtil.Reset({})

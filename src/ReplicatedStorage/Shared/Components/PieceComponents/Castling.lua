@@ -27,7 +27,7 @@ function Castling:CheckIfIsValidPath(pos1: number,pos2: number)
 	local isValidPath = true
 	local oppColor = BoardUtil.GetColor(not self.IsBlack)
 
-	local board = self.Board:Get("Board")
+	local board = self.Board.Board
 	for offPos = pos1,pos2,(pos2 < pos1 and -1 or 1) do
 		local tile = BoardUtil:Get(board,offPos)
 		local attacking = BoardUtil:Get(self.Board:Get(oppColor).Attacking,offPos)
@@ -43,22 +43,22 @@ end
 function Castling:ComputeLegalMoves()
 	local piece = self.Piece
 	local board = self.Board
-	local currentPos = piece:Get("Position")
+	local currentPos = piece.Position
 
-	if piece:HasTag("King") and piece:Get("CanCastle") then
-		local oppColor = BoardUtil.GetColor(not piece:Get("IsBlack"))
-		local curColor = BoardUtil.GetColor(piece:Get("IsBlack"))
+	if piece:HasTag("King") and piece.CanCastle then
+		local oppColor = BoardUtil.GetColor(not piece.IsBlack)
+		local curColor = BoardUtil.GetColor(piece.IsBlack)
 
-		local yVal = piece:Get("IsBlack") and 8 or 1
+		local yVal = piece.IsBlack and 8 or 1
 		local rookQ = piece:GetPiece(Vector2.new(1,yVal))
 		local rookK = piece:GetPiece(Vector2.new(8,yVal))
 		--//Check for both rooks
 		if rookQ then	
 			local pathClear = self:CheckIfIsValidPath(currentPos,currentPos - 3)
 			--//Check all possibilities
-			if rookQ:HasTag("Rook") and rookQ:Get("IsBlack") == piece:Get("IsBlack") and rookQ:Get("CanCastle") and pathClear then
+			if rookQ:HasTag("Rook") and rookQ.IsBlack == piece.IsBlack and rookQ.CanCastle and pathClear then
 				local newKingPos = currentPos - 2
-				local rookPos = rookQ:Get("Position")
+				local rookPos = rookQ.Position
 				local newRookPos = rookPos + 3
 				piece:AddLegalMove(newKingPos,Action.new("Move",currentPos,newKingPos,"Move",rookPos,newRookPos))
 			end
@@ -67,9 +67,9 @@ function Castling:ComputeLegalMoves()
 		if rookK then
 			local pathClear = self:CheckIfIsValidPath(currentPos,currentPos + 2)
 			--//Check all possibilities
-			if rookK:HasTag("Rook") and rookK:Get("IsBlack") == piece:Get("IsBlack") and rookK:Get("CanCastle") and pathClear then
+			if rookK:HasTag("Rook") and rookK.IsBlack == piece.IsBlack and rookK.CanCastle and pathClear then
 				local newKingPos = currentPos + 2
-				local rookPos = rookQ:Get("Position")
+				local rookPos = rookQ.Position
 				local newRookPos = rookPos - 2
 				piece:AddLegalMove(newKingPos,Action.new("Move",currentPos,newKingPos,"Move",rookPos,newRookPos))
 			end

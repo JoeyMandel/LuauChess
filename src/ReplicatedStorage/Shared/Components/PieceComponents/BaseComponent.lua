@@ -2,26 +2,23 @@
 -- UnknownParabellum
 -- February 26, 2021
 
---[[
-	
-	local baseComponent = BaseComponent.new()
-	
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
---]]
+local TagSystem = require(Knit.Shared.Classes.TagSystem)
+local Maid = require(Knit.Shared.Lib.Maid)
 
 local BaseComponent = {}
 BaseComponent.__index = BaseComponent
 
 
 function BaseComponent.new(piece)
-	local framework = require(script.Parent)
 	local self = setmetatable({
 		["Piece"] = piece,
-		["Board"] = piece:Get("Board"),
+		["Board"] = piece.Board,
 		["Position"] = piece.Position,
-		["__maid"] = framework.Shared.Lib.Maid.new()
+		["__maid"] = Maid.new(),
 	}, BaseComponent)
-	framework.Shared.TagSystem.Include(self)
+	TagSystem.Include(self)
 	
 	return self
 end
