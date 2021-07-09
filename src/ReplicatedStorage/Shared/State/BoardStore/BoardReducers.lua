@@ -9,6 +9,8 @@ local BoardActions = require(script.Parent.BoardActions)
 
 local ReducerFuncs = {}
 
+local v2ToInt = BoardUtil.Vector2ToInt
+
 local function shallowCopyState(oldState)
     local newState = {}
 
@@ -22,8 +24,8 @@ end
 function ReducerFuncs.Move(state, action)
     local newState = shallowCopyState(state)
 
-    local orig = action.orig
-    local target = action.target
+    local orig = v2ToInt(action.orig)
+    local target = v2ToInt(action.target)
 
     local origTile = newState[orig]
     local targetTile = newState[target]
@@ -46,7 +48,7 @@ function ReducerFuncs.Destroy(state, action)
 
     local boardObject = newState.Board
 
-    local target = action.target
+    local target = v2ToInt(action.target)
     local targetTile  = newState[target]
 
     
@@ -65,14 +67,14 @@ function ReducerFuncs.Create(state, action)
     local newState = shallowCopyState(state)
     
     local boardObject = newState.Board
-    local target = action.target
+    local target = v2ToInt(action.target)
     local targetTile  = newState[target]
 
     local newPiece = Piece.new({
         ["pieceType"] = action.type,
-        ["Position"] = action.target,
+        ["Position"] = target,
         ["Board"] = boardObject,
-        ["Color"] = action.Color,
+        ["Color"] = action.isBlack,
     })
 
     targetTile.Piece = newPiece

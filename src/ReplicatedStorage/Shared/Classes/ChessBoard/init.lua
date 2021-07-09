@@ -39,7 +39,7 @@ local Piece = require(Knit.Shared.Classes.Piece)
 local ColorHandler = require(script.ColorHandler)
 
 local BoardStore = require(Knit.Shared.State.BoardStore)
-
+local BoardActions = require(Knit.Shared.State.BoardStore.BoardActions)
 
 local initialToName = {["p"] = "Pawn",["n"] = "Knight",["b"] = "Bishop",["r"] = "Rook",["q"] = "Queen",["k"] = "King"}
 
@@ -59,6 +59,7 @@ ChessBoard.__index = ChessBoard
 function ChessBoard.new(state)
 
 	local self = setmetatable({
+		["Class"] = "ChessBoard",
 		["Board"] =  nil,
 		["LastFENStates"] = {},
 		["LastActions"] = {},
@@ -148,8 +149,38 @@ function ChessBoard:Move(piecePos, targetPos, input)
 end
 
 --// Utils
+--// Init Fen 
+--//rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 function ChessBoard:LoadFromFen(state)
+	local fields = string.split(state," ")  --Splits a fen string into its individual fields
 
+	for index,rank in pairs(string.split(fields[1],"/") ) do
+		local currentRank = 9-index
+		local chars = StringUtil.ToCharArray(rank)
+		local currentFile = 1
+		for _,char in pairs(chars) do		
+			local isNumber = (tonumber(char)~=nil)
+			if isNumber then
+				currentFile += tonumber(char) --Skips and adds if just a number
+			else
+				local realPiece = initialToName[string.lower(char)]
+				local isBlack = (char == string.lower(char)) 
+
+				self.Board:dispatch(
+					BoardActions.createCreate({
+						["Target"] = Vector2.new(currentFile, currentRank),
+						["Type"] = realPiece,
+						["IsBlack"] = isBlack,
+					})
+				)
+
+				currentFile += 1
+			end
+		end
+		currentFile = 1
+	end
+
+	self.WhiteToNextMove = (fields[2] == "w" and true) or false
 end
 
 function ChessBoard:GetColorState(isBlack)

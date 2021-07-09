@@ -21,10 +21,10 @@ end
 
 function BoardActions.createCreate(config)
     return {
-        ["type"] = "Destroy",
+        ["type"] = "Create",
         ["target"] = config.Target,
         ["pieceType"] = config.Type,
-        ["color"] = config.Color,
+        ["isBlack"] = config.IsBlack,
     }
 end
 
