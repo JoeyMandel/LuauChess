@@ -8,12 +8,14 @@
 	
 
 --]]
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
+
 local BaseComponent = require(script.Parent.BaseComponent)
 
 local Action
-local BoardUtil
-local toInt
-local toVec2
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
+local toVec2 = BoardUtil.IntToVector2 
+local toInt = BoardUtil.Vector2ToInt
 
 local PawnMovement = setmetatable({},BaseComponent)
 PawnMovement.__index = PawnMovement
@@ -106,15 +108,6 @@ function PawnMovement.new(piece,config)
 	end
 	return self
 	
-end
-
-
-function PawnMovement:Init(framework)
-	BoardUtil = self.Shared.Lib.BoardUtil
-	toInt = BoardUtil.Vector2ToInt
-	toVec2 = BoardUtil.IntToVector2
-
-	Action = self.Shared.Action
 end
 
 return PawnMovement

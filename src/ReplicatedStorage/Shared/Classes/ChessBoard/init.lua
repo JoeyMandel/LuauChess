@@ -151,7 +151,7 @@ end
 --// Utils
 --// Init Fen 
 --//rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-function ChessBoard:LoadFromFen(state)
+function ChessBoard:LoadFromFEN(state)
 	local fields = string.split(state," ")  --Splits a fen string into its individual fields
 
 	for index,rank in pairs(string.split(fields[1],"/") ) do
@@ -166,6 +166,11 @@ function ChessBoard:LoadFromFen(state)
 				local realPiece = initialToName[string.lower(char)]
 				local isBlack = (char == string.lower(char)) 
 
+				print(BoardActions.createCreate({
+					["Target"] = Vector2.new(currentFile, currentRank),
+					["Type"] = realPiece,
+					["IsBlack"] = isBlack,
+				}))
 				self.Board:dispatch(
 					BoardActions.createCreate({
 						["Target"] = Vector2.new(currentFile, currentRank),

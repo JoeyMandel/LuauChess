@@ -17,6 +17,7 @@ return function()
             for _, tile in pairs(collisions) do
                 if typeof(tile) ~= "table" or tile.Class ~= "Tile" then
                     allTiles = false
+                    break
                 end
             end
 
@@ -27,6 +28,7 @@ return function()
             for _, tile in pairs(collisions) do
                 if not tile.IsDark then 
                     allDark = false
+                    break
                 end
             end
 
@@ -34,12 +36,15 @@ return function()
         end)
         it("Subsequent collisions' position's magnitudes are larger than the last", function()
             local allLarger = true
-            for i, tile in pairs(collisions) do
-                if tile.Position.Magnitude < collisions[i].Position.Magnitude then 
-                    allLarger = false
+            for i, tile in ipairs(collisions) do
+                if i ~= #collisions then
+                    if tile.Position.Magnitude > collisions[i + 1].Position.Magnitude then 
+                        allLarger = false
+                        break
+                    end
                 end
             end
-
+            print(collisions)
             expect(allLarger).to.equal(true)
         end)
     end)

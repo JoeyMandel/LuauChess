@@ -12,8 +12,12 @@ local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
 local HttpService = game:GetService("HttpService")
 
-local PieceComponents
-local BoardUtil
+
+local PieceComponents = require(Knit.Shared.Components.PieceComponents)
+local TagSystem = require(Knit.Shared.Classes.TagSystem)
+
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
+local Maid = require(Knit.Shared.Lib.Maid)
 
 local Piece = {}
 Piece.__index = Piece
@@ -164,10 +168,10 @@ function Piece.new(config)
 			["Id"] = HttpService:GenerateGUID(false),
 			["Components"] = {},
 			["IsDead"] = false,
-			["__maid"] = require(Knit.Shared.Lib.Maid).new()
+			["__maid"] = Maid.new()
 		}, Piece)
 		
-		require(Knit.Shared.TagSystem).Include(base)
+		TagSystem.Include(base)
 		
 		base:AddComponent("GlobalPieceProperties")
 		realPiece = require(mod).new(base)
@@ -192,12 +196,5 @@ function Piece:Destroy()
 	self.IsDead = true
 	self.__maid:DoCleaning()
 end
-
-function Piece:Init()
-	BoardUtil = require(Knit.Shared.Lib.BoardUtil)
-	PieceComponents = require(Knit.Shared.Components.PieceComponents)
-end
-
-Piece:Init()
 
 return Piece

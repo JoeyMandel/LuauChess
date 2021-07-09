@@ -6,11 +6,11 @@
 	
 
 --]]
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
-local BoardUtil
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 
 local BaseComponent = require(script.Parent.BaseComponent)
-
 
 local GlobalPieceProperties = setmetatable({},BaseComponent)
 GlobalPieceProperties.__index = GlobalPieceProperties
@@ -71,10 +71,6 @@ function GlobalPieceProperties.new(piece,config)
 
 	self:AddTag("MovementLast")
 	return self
-end
-
-function GlobalPieceProperties:Init(framework)
-	BoardUtil = framework.Shared.Lib.BoardUtil
 end
 
 

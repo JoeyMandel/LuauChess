@@ -69,13 +69,15 @@ function ReducerFuncs.Create(state, action)
     local boardObject = newState.Board
     local target = v2ToInt(action.target)
     local targetTile  = newState[target]
+    print("Created")
 
     local newPiece = Piece.new({
-        ["pieceType"] = action.type,
+        ["Type"] = action.pieceType,
         ["Position"] = target,
         ["Board"] = boardObject,
         ["Color"] = action.isBlack,
     })
+    print("Created Piece")
 
     targetTile.Piece = newPiece
 

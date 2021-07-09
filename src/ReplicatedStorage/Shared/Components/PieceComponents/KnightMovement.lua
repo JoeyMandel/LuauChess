@@ -6,10 +6,11 @@
 	
 
 --]]
-
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
 local BaseComponent = require(script.Parent.BaseComponent)
-local BoardUtil
+
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 
 local KnightMovement = setmetatable({},BaseComponent)
 KnightMovement.__index = KnightMovement
@@ -49,10 +50,5 @@ function KnightMovement.new(piece,config)
 	self:AddTag("Movement")
 	return self
 end
-
-function  KnightMovement.new(framework)
-	BoardUtil = framework.Shared.Lib.BoardUtil
-end
-
 
 return KnightMovement

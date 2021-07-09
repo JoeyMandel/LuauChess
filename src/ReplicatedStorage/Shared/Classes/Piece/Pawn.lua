@@ -17,7 +17,6 @@ Pawn.__index = Pawn
 function Pawn.new(base)	
 	local self = setmetatable(base,Pawn)
 	self.Type = "Pawn"
-
 	self:AddTag("Pawn")
 	self:AddComponent("PawnMovement")
 	return self

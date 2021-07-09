@@ -7,10 +7,9 @@
 
 --]]
 
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
-local BoardUtil
-local toInt
-local toVec2
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 
 local BaseComponent = require(script.Parent.BaseComponent)
 
@@ -109,12 +108,5 @@ function DiagonalMovement.new(piece,config)
 	self:AddTag("Movement")
 	return self
 end
-
-function DiagonalMovement:Init(framework)
-	BoardUtil = framework.Shared.Lib.BoardUtil
-	toVec2 = BoardUtil.IntToVector2
-	toInt = BoardUtil.Vector2ToInt
-end
-
 
 return DiagonalMovement

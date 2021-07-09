@@ -8,10 +8,12 @@
 	
 
 	--]]
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
+
 local BaseComponent = require(script.Parent.BaseComponent)
 
-local BoardUtil
-local toInt
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
+local toInt = BoardUtil.Vector2ToInt
 
 local Action
 
@@ -109,12 +111,6 @@ function Castling.new(piece)
 	
 	self:AddTag("Movement")
 	return self
-end
-
-function Castling:Init(framework)
-	BoardUtil = framework.Shared.Lib.BoardUtil
-	toInt = BoardUtil.Vector2ToInt
-	Action = self.Shared.Action
 end
 
 return Castling

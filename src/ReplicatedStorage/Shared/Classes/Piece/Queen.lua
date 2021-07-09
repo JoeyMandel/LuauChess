@@ -17,7 +17,6 @@ Queen.__index = Queen
 function Queen.new(base)	
 	local self = setmetatable(base,Queen)
 	self.Type = "Queen"
-
 	self:AddTag("Queen")
 	self:AddComponent("TwoAxisMovement")
 	self:AddComponent("DiagonalMovement")

@@ -6,12 +6,12 @@
 --]]
 
 
-
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
 local BaseComponent = require(script.Parent.BaseComponent)
 
-local BoardUtil
-local toInt 
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
+local toInt = BoardUtil.Vector2ToInt
 
 local KingMovement = setmetatable({},BaseComponent)
 KingMovement.__index = KingMovement
@@ -44,9 +44,5 @@ function KingMovement.new(piece,config)
 	return self
 end
 
-function KingMovement:Init(framework)
-	BoardUtil = framework.Shared.Lib.BoardUtil
-	toInt = BoardUtil.Vector2ToInt
-end
 
 return KingMovement

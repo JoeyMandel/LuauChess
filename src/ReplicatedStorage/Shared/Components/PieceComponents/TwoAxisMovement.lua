@@ -12,7 +12,8 @@
 
 
 local BaseComponent = require(script.Parent.BaseComponent)
-local BoardUtil
+
+local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 
 local TwoAxisMovement = setmetatable({},BaseComponent)
 TwoAxisMovement.__index = TwoAxisMovement
@@ -111,7 +112,4 @@ function TwoAxisMovement.new(piece,config)
 	return self
 end
 
-function TwoAxisMovement:Init(framework)
-	BoardUtil = framework.Shared.Lib.BoardUtil
-end
 return TwoAxisMovement
