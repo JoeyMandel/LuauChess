@@ -15,10 +15,6 @@ local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 local KnightMovement = setmetatable({},BaseComponent)
 KnightMovement.__index = KnightMovement
 
-function KnightMovement:BeforeUpdate(changes)
-
-end
-
 function KnightMovement:ComputeLegalMoves()
 	local piece = self.Piece
 	local board = self.Board:Get("Board")

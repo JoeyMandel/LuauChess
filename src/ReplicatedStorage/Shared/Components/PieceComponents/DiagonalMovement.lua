@@ -17,11 +17,6 @@ local BaseComponent = require(script.Parent.BaseComponent)
 local DiagonalMovement = setmetatable({},BaseComponent)
 DiagonalMovement.__index = DiagonalMovement
 
-
-function DiagonalMovement:BeforeUpdate(changes)
-
-end
-
 function DiagonalMovement:ComputeLegalMoves()
 	local piece = self.Piece
 	local board = self.Board.Board:getState()

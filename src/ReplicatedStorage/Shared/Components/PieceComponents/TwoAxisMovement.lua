@@ -18,10 +18,6 @@ local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
 local TwoAxisMovement = setmetatable({},BaseComponent)
 TwoAxisMovement.__index = TwoAxisMovement
 
-function TwoAxisMovement:BeforeUpdate(changes)
-
-end
-
 function TwoAxisMovement:ComputeLegalMoves()
 	local piece = self.Piece
 	local board = self.Board.Board:getState()

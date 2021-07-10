@@ -16,10 +16,6 @@ local toInt = BoardUtil.Vector2ToInt
 local KingMovement = setmetatable({},BaseComponent)
 KingMovement.__index = KingMovement
 
-function KingMovement:BeforeUpdate(changes)
-
-end
-
 function KingMovement:ComputeLegalMoves()
 	local piece = self.Piece
 	local board = piece.Board.Board
