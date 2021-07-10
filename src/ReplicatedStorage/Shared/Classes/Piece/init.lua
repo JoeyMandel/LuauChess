@@ -88,11 +88,11 @@ function Piece:ComputeLegalMoves()
 	return self.LegalMoves
 end
 
-function Piece:AddLegalMove(position,moveInfo)
+function Piece:AddLegalMove(position)
 	local color = self.IsBlack and "Black" or "White"	
 	--moveInfo = moveInfo or Action.new("Move",self.Position,position)
 
-	BoardUtil.Set(self.LegalMoves,position,moveInfo)
+	BoardUtil.Set(self.LegalMoves,position,true)
 	local legalMoves = BoardUtil.Get(self.Board[color].LegalMoves,position)
 	if legalMoves then
 		legalMoves[self] = true
