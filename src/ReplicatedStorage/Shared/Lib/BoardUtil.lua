@@ -54,7 +54,37 @@ function BoardUtil.GetPieceIndexFromArray(array, piece)
 	return 0
 end
 
-function BoardUtil.FireRay(board, orig, target, collisionCheck)
+function BoardUtil.FireRayInDirection(board,orig, dir, collisionCheck)
+	local collisions = {}
+
+	local delta_x = dir.X 
+	local delta_y = dir.Y 
+	local slope = delta_y/delta_x
+	
+	local next = nil
+	local offset = Vector2.new()
+
+	local function getNext()
+		local c_X = offset.X + 1
+		return Vector2.new(c_X, math.floor(c_X * slope))
+	end
+
+	repeat 
+		offset = getNext()
+		next = orig + getNext()
+
+		local value = board[BoardUtil.Vector2ToInt(next)]
+		if value then
+			if collisionCheck(value) then
+				table.insert(collisions, value)
+			end
+		end
+	until next.X > 8 or next.Y > 8
+
+	return collisions
+end
+
+function BoardUtil.FireRayToPoint(board, orig, target, collisionCheck)
 	local collisions = {}
 
 	local delta_x = target.X - orig.X
