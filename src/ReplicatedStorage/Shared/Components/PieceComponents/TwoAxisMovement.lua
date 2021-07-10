@@ -9,7 +9,7 @@
 
 --]]
 
-
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
 
 local BaseComponent = require(script.Parent.BaseComponent)
 
@@ -24,82 +24,64 @@ end
 
 function TwoAxisMovement:ComputeLegalMoves()
 	local piece = self.Piece
-	local board = self.Board:Get("Board")
-	local piecePos = piece:Get("Position")
-	local oppColor = BoardUtil.GetColor(not piece:Get("IsBlack"))
-	
-	local distFromLeft = BoardUtil.GetX(piecePos)
-	local distFromRight = 8 - distFromLeft
-	local distFromBottom = BoardUtil.GetY(piecePos)	
-	local distFromTop = 8-distFromBottom
-	
-	local path = {}
-	local isPinning = false
-	local checking = false
+	local board = self.Board.Board:getState()
+	local piecePos = piece.Position
 
-	local function iterateThroughPath(dist,dirX,dirY)
-		local piecesHit = 0
-		local enemyPiecesHit = 0 
-		local lastEnemyPiece
-		local lastPieceHit 
+	local pieceColor = piece.IsBlack
 
-		for offset = 1,dist do
-			local currentPos = piecePos + (9*(dirX*offset)) + (offset*dirY)
-
-			if piecesHit == 0 then
-				piece:AddLegalMove(currentPos)
-				piece:AddAttackingMove(currentPos)
+	local function processPath(dir)
+		local piecesHit = BoardUtil.FireRayInDirection(board, piecePos, dir, function(tile)
+			if tile.Piece then
+				return true
 			end
+			return false
+		end)
+		local path = BoardUtil.FireRayInDirection(board, piecePos, dir, function(tile)
+			return true
+		end)
 
-			if not isPinning and not checking then
-				table.insert(path,currentPos)
+		local checking
+		local pinning 
+
+		local firstHit = piecesHit[1] and piecesHit[1].Piece
+		local secondHit = piecesHit[2] and piecesHit[2].Piece
+
+		if firstHit then
+			--Must be checking the enemy king!
+			if firstHit:HasTag("King") and firstHit.IsBlack ~= pieceColor then
+				checking = true
 			end
-			local hitPiece = piece:GetPiece(currentPos)
-			if hitPiece then
-				piecesHit += 1
+		end
+		if secondHit then
+			--Must be pinning the first piece!
+			if firstHit:HasTag("King") and firstHit.IsBlack ~= pieceColor and firstHit.IsBlack ~= pieceColor then
+				pinning = true
+			end
+		end
 
-				lastPieceHit = true
-				if hitPiece:Get("IsBlack") ~= piece:Get("IsBlack") then
-					if enemyPiecesHit < 2 then
-						enemyPiecesHit += 1
-						if piecesHit == 2 then
-							if hitPiece == (self.Board:Get(oppColor).Pieces["King"]) then
-								piece:Pin(lastEnemyPiece:Get("Position"))
-								isPinning = true
-							end
-							break
-						elseif piecesHit == 1 then
-							if hitPiece == (piece.Board[oppColor].Pieces["King"]) then
-								checking = true
-								local dir = dist > 1 and 1 or -1
-								piece:AddAttackingMove(currentPos+piecePos + (9*(dirX*(offset+1))) + ((1+offset)*dirY))
-								break
-							else
-								lastEnemyPiece = hitPiece
-							end
-						end
-					else
-						break
-					end
+		for _, tile in ipairs(path) do
+			local pos = tile.Position
+
+			if checking or pinning then
+				piece:AddToPath(pos)
+			end
+			piece:AddAttackingMove(pos)
+
+			if tile.Piece then
+				if tile.Piece.IsBlack ~= pieceColor then
+					piece:AddLegalMove(pos)
 				end
+				break
+			else
+				piece:AddLegalMove(pos)
 			end
 		end
-		if not isPinning and not checking then
-			table.clear(path)
-		end
 	end
-	--//To Right
-	iterateThroughPath(distFromRight,1,0)
-	--//To Left
-	iterateThroughPath(distFromLeft,-1,0)
-	--//To Top
-	iterateThroughPath(distFromTop,0,1)
-	--//To Bottom
-	iterateThroughPath(distFromBottom,0,-1)
 	
-	for _,pos in pairs(path) do
-		piece:AddToPath(pos)
-	end
+	processPath(Vector2.new(1,1))
+	processPath(Vector2.new(-1,1))
+	processPath(Vector2.new(1,-1))
+	processPath(Vector2.new(-1,-1))
 end
 
 function TwoAxisMovement.new(piece,config)
@@ -107,7 +89,6 @@ function TwoAxisMovement.new(piece,config)
 	local self = setmetatable(base, TwoAxisMovement)
 
 	self:AddTag("Movement")
-	self:AddTag("UpdateMovesAfterMove")
 	
 	return self
 end

@@ -24,81 +24,64 @@ end
 
 function DiagonalMovement:ComputeLegalMoves()
 	local piece = self.Piece
-	local board = self.Board:Get("Board")
-	local piecePos = piece:Get("Position")
-	local oppColor = BoardUtil.GetColor(not piece:Get("IsBlack"))
+	local board = self.Board.Board:getState()
+	local piecePos = piece.Position
 
-	local distFromLeft = BoardUtil.GetX(piecePos)
-	local distFromRight = 8 - distFromLeft
-	local distFromBottom = BoardUtil.GetY(piecePos)	
-	local distFromTop = 8-distFromBottom
-	
-	local path = {}
-	local isPinning = false
-	local checking = false
-	
-	local function iterateThroughPath(dist,dirX,dirY)
-		local piecesHit = 0
-		local enemyPiecesHit = 0 
-		local lastEnemyPiece
-		local lastPieceHit 
-		
-		for offset = 1,dist do
-			local currentPos = piecePos + (9*(dirX*offset)) + (offset*dirY)
-			
-			if piecesHit == 0 then
-				piece:AddLegalMove(currentPos)
-				piece:AddAttackingMove(currentPos)
+	local pieceColor = piece.IsBlack
+
+	local function processPath(dir)
+		local piecesHit = BoardUtil.FireRayInDirection(board, piecePos, dir, function(tile)
+			if tile.Piece then
+				return true
 			end
-			
-			if not isPinning and not checking then
-				table.insert(path,currentPos)				
+			return false
+		end)
+		local path = BoardUtil.FireRayInDirection(board, piecePos, dir, function(tile)
+			return true
+		end)
+
+		local checking
+		local pinning 
+
+		local firstHit = piecesHit[1] and piecesHit[1].Piece
+		local secondHit = piecesHit[2] and piecesHit[2].Piece
+
+		if firstHit then
+			--Must be checking the enemy king!
+			if firstHit:HasTag("King") and firstHit.IsBlack ~= pieceColor then
+				checking = true
 			end
-			local hitPiece = piece:GetPiece(currentPos)
-			if hitPiece then
-				piecesHit += 1
-				lastPieceHit = true
-				if (hitPiece:Get("IsBlack") ~= piece:Get("IsBlack")) then
-					if enemyPiecesHit < 2 then
-						enemyPiecesHit += 1
-						if enemyPiecesHit == 2 then
-							if hitPiece == (self.Board:Get(oppColor).Pieces["King"]) then
-								piece:Pin(lastEnemyPiece:Get("Position"))
-								isPinning = true
-							end
-							break
-						elseif enemyPiecesHit == 1 then
-							if hitPiece == (self.Board:Get(oppColor).Pieces["King"]) then
-								checking = true
-								local dir = dist > 1 and 1 or -1
-								piece:AddAttackingMove(currentPos+piecePos + (9*(dirX*(offset+1))) + ((1+offset)*dirY))
-								break
-							else
-								lastEnemyPiece = hitPiece
-							end
-						end
-					else
-						break
-					end
+		end
+		if secondHit then
+			--Must be pinning the first piece!
+			if firstHit:HasTag("King") and firstHit.IsBlack ~= pieceColor and firstHit.IsBlack ~= pieceColor then
+				pinning = true
+			end
+		end
+
+		for _, tile in ipairs(path) do
+			local pos = tile.Position
+
+			if checking or pinning then
+				piece:AddToPath(pos)
+			end
+			piece:AddAttackingMove(pos)
+
+			if tile.Piece then
+				if tile.Piece.IsBlack ~= pieceColor then
+					piece:AddLegalMove(pos)
 				end
+				break
+			else
+				piece:AddLegalMove(pos)
 			end
 		end
-		if not isPinning and not checking then
-			table.clear(path)
-		end
 	end
-	--//To Top right corner
-	iterateThroughPath(math.min(distFromRight,distFromTop),1,1)
-	--//To Top left corner
-	iterateThroughPath(math.min(distFromLeft,distFromTop),-1,1)
-	--//To Bottom left corner
-	iterateThroughPath(math.min(distFromLeft,distFromBottom),-1,-1)
-	--//To Bottom left corner
-	iterateThroughPath(math.min(distFromRight,distFromBottom),1,-1)
 	
-	for _,pos in pairs(path) do
-		piece:AddToPath(pos)
-	end
+	processPath(Vector2.new(1,1))
+	processPath(Vector2.new(-1,1))
+	processPath(Vector2.new(1,-1))
+	processPath(Vector2.new(-1,-1))
 end
 
 function DiagonalMovement.new(piece,config)
