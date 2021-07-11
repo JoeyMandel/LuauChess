@@ -14,25 +14,23 @@ local BaseComponent = require(script.Parent.BaseComponent)
 
 local Action
 local BoardUtil = require(Knit.Shared.Lib.BoardUtil)
-local toVec2 = BoardUtil.IntToVector2 
-local toInt = BoardUtil.Vector2ToInt
 
 local PawnMovement = setmetatable({},BaseComponent)
 PawnMovement.__index = PawnMovement
 
 function PawnMovement:BeforeUpdate(changes)
-	local isBlack = self.Piece:Get("IsBlack")
-	local currentPos = self.Piece:Get("Position")
+	local isBlack = self.Piece.IsBlack
+	local currentPos = self.Piece.Position
 	local newPos = changes[2]
 	local startingRow = self.StartingRow
 	
-	if BoardUtil:GetY(currentPos) == startingRow then
-		local doubleMoved = (isBlack and BoardUtil:GetY(newPos) == (startingRow - 2)) or BoardUtil:GetY(newPos) == (startingRow  + 2)
+	if currentPos.Y == startingRow then
+		local doubleMoved = (isBlack and newPos.Y == (startingRow - 2)) or newPos.Y == (startingRow  + 2)
 		if doubleMoved then
-			self.Piece:Set("EnPassent",true)
+			self.Piece.EnPassent =true
 			self.__maid["Moved"] = self.Board.BeforeMoved:Connect(function()
 				self.__maid["Moved"] = nil
-				self.Piece:Set("EnPassent", false)
+				self.Piece.EnPassent = false
 			end)
 		end
 	end
@@ -40,55 +38,62 @@ end
 
 function PawnMovement:ComputeLegalMoves()
 	local piece = self.Piece
-	local piecePos = piece:Get("Position")
-	local isBlack = piece:Get("IsBlack")
-	local direct = isBlack and -1 or 1
+	local board = self.Board
+	local pos = piece.Position
+	local isBlack = piece.IsBlack 
 
-	local frontPiece = piecePos + direct
-	
-	local leftCrossPos = piecePos + toInt(-1,direct)
-	local rightCrossPos = piecePos + toInt(1,direct)
-	local leftPassentPos = piecePos + toInt(-1,0)
-	local rightPassentPos = piecePos + toInt(1,0)
+	local direction = isBlack and -1 or 1
+	local isFirstMove = isBlack and pos.Y == 7 or pos.Y == 2
 
+	--// Moving forward one
+	local frontPos = pos + Vector2.new(0, direction)
+	local canMoveForward = not board:GetPieceFromPosition(frontPos)
 
-	local leftCrossPiece = piece:GetPiece(leftCrossPos)
-	local rightCrossPiece = piece:GetPiece(rightCrossPos)
-	local leftPassent = piece:GetPiece(leftPassentPos)
-	local rightPassent = piece:GetPiece(rightPassentPos)
+	if canMoveForward then
+		piece:AddLegalMove(frontPos)
+	end
 
-	if not frontPiece then
-		piece:AddLegalMove(piecePos + toInt(0,direct))
-		
-		local doubleFrontPiece = piece:GetPiece(piecePos + toInt(0,2*direct))
-		if (BoardUtil:GetY(piecePos)== self.StartingRow) and not doubleFrontPiece then -- 2 steps forward
-			piece:AddLegalMove(piecePos + toInt(0,2*direct))
+	--// Jumping on first move
+	local doubleFrontPos = pos + Vector2.new(0, 2 * direction)
+	local canJump = isFirstMove and not board:GetPieceFromPosition(doubleFrontPos) or false
+
+	if canJump then
+		piece:AddLegalMove(doubleFrontPos)
+	end
+
+	--// Attacking right up
+	local crossLeftPos = pos + Vector2.new(1,direction)
+	local crossLeftPiece = board:GetPieceFromPosition(crossLeftPos)
+
+	if crossLeftPiece then
+		piece:AddLegalMove(crossLeftPos)
+	end
+	piece:AddAttackingMove(crossLeftPos)
+	--// Attacking left up
+	local crossRightPos = pos + Vector2.new(-1,direction)
+	local crossRightPiece = board:GetPieceFromPosition(crossRightPos)
+
+	if crossRightPiece then
+		piece:AddLegalMove(crossRightPos)
+	end
+	piece:AddAttackingMove(crossRightPos)
+
+	--// EN PASSENT
+
+	--// Left Passent
+	local leftPiece = board:GetPieceFromPosition(pos + Vector2.new(-1,0))
+
+	if leftPiece then
+		if leftPiece:HasTag("Pawn") and leftPiece:HasTag("EnPassent") then
+			piece:AddLegalMove(pos + Vector2.new(-1, direction))
 		end
 	end
-	
-	piece:AddAttackingMove(leftCrossPos)
-	piece:AddAttackingMove(rightCrossPos)
+	--// Right Passent
+	local rightPiece = board:GetPieceFromPosition(pos + Vector2.new(1,0))
 
-	if leftCrossPiece then -- attacking left cross
-		piece:AddLegalMove(leftCrossPos)
-	end
-	if rightCrossPiece then --attacking right cross
-		piece:AddLegalMove(rightCrossPos)
-	end
-	
-	if leftPassent then
-		if leftPassent.Type == "Pawn" and leftPassent:Get("EnPassent") then
-			local moveInfo = Action.new("Move",piecePos,leftCrossPos,"Destroy",leftPassent:Get("Position"))
-			piece:AddLegalMove(leftCrossPos,moveInfo)
-			piece:AddAttackingMove(leftCrossPos)
-		end
-	end
-	if rightPassent then
-		if rightPassent.Type == "Pawn" and rightPassent:Get("EnPassent") then
-			local moveInfo = Action.new("Move",piecePos,rightCrossPos,"Destroy",rightPassent:Get("Position"))
-			
-			piece:AddLegalMove(rightCrossPos,moveInfo)
-			piece:AddAttackingMove(rightCrossPos)
+	if rightPiece then
+		if rightPiece:HasTag("Pawn") and rightPiece:HasTag("EnPassent") then
+			piece:AddLegalMove(pos + Vector2.new(1, direction))
 		end
 	end
 end
@@ -99,9 +104,9 @@ function PawnMovement.new(piece,config)
 	
 	self:AddTag("Movement")
 	
-	self.Piece:Set("EnPassent", (config.EnPassent ~= nil))
+	self.Piece.EnPassent = (config.EnPassent ~= nil)
 	self.StartingRow = 0
-	if self.Piece:Get("IsBlack") then
+	if self.Piece.IsBlack then
 		self.StartingRow = 7
 	else
 		self.StartingRow = 2
