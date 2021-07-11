@@ -44,7 +44,7 @@ function Timers:StartCounting(timeLimitation, startingIsBlack)
 	self.BlackTimer = TimerClass.new(timeLimitation)
 	self.NextIsBlack = startingIsBlack
 	
-	self.__maid["BoardChanged"] = self.Board.AfterMoved:Connect(function()
+	self.__maid["BoardChanged"] = self.Board.OnPostStep:Connect(function()
 		local currentTimer = self.NextIsBlack and self.BlackTimer or self.WhiteTimer
 		local lastTimer = self.NextIsBlack and self.WhiteTimer or self.BlackTimer
 		self.NextIsBlack = not self.NextIsBlack

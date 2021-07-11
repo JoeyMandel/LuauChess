@@ -91,7 +91,7 @@ function Board:GetTargetTile(pos)
 			if object:IsDescendantOf(file) then
 				for _,rank in pairs(file:GetChildren()) do
 					if object:IsDescendantOf(rank) or object == rank then
-						return BoardUtil.Get(self.Board.Board,Vector2.new(tonumber(file.Name),tonumber(rank.Name)))
+						return BoardUtil.Get(self.Board.Board:getState(),Vector2.new(tonumber(file.Name),tonumber(rank.Name)))
 					end
 				end
 			end
@@ -106,9 +106,6 @@ function Board:ShowLegalMoves(legalMoves)
 		local tile = self:GetVisTile(currentPos)
 		local newDot
 		if tile.Piece.Visible then
-			local palette = self.DisplayConfig.Palette
-			local isDark = BoardUtil.Get(self.Board.Board,currentPos).IsDark
-
 			newDot = Templates.Attacking:Clone()
 			newDot.Size = UDim2.fromScale(1,1)
 			newDot.Circle.BackgroundColor3 = tile.BackgroundColor3
@@ -133,6 +130,7 @@ end
 --// Displaying 
 
 function Board:RemoveOldBoard()
+	warn("DESTROYING OLD BOARD")
 	for _,file in pairs(UI.Board:GetChildren()) do
 		if file:IsA("Frame") then
 			file:Destroy()
@@ -145,15 +143,16 @@ function Board:Display(paletteName,styleName,fromWhitePerspective)
 	local templateFile = Templates.File	
 	local templateTile = Templates.Tile
 	local templateLabel = Templates.TileLabel
-
-	local board = self.Board.Board
+	
+	local board = self.Board.Board:getState()
 
 	local style = PieceStyles[styleName] 
 	local palette = Palettes[paletteName]
 	self.DisplayConfig.Palette = palette
 	self.DisplayConfig.PieceStyle = style
-
+	
 	self:RemoveOldBoard()
+	
 	
 	local offset = fromWhitePerspective and 1 or -1
 	local endNum = fromWhitePerspective and 8 or 1
@@ -172,7 +171,6 @@ function Board:Display(paletteName,styleName,fromWhitePerspective)
 			newTile.Parent = newFile
 			newTile.BackgroundColor3 = tile.IsDark and palette.Dark or palette.Light
 			newTile.Name = tostring(rank)
-			
 			--//Display labels [for first file]
 			if (file == startNum) then
 				local targetTileA = VisBoard[startNum][rank]
@@ -200,10 +198,11 @@ function Board:Display(paletteName,styleName,fromWhitePerspective)
 		newLabelB.TextColor3 = not BoardUtil.Get(board,Vector2.new(file,startNum)).IsDark and palette.Dark or palette.Light
 		newLabelB.Text = tostring(BoardUtil.Get(board,Vector2.new(file,startNum)).File)
 	end
+	warn("Displaying new board")
 end
 
 function Board:UpdatePosition(changes)
-	local board = self.Board.Board
+	local board = self.Board.Board:getState()
 
 	if self.Highlighted["OrigLast"] and self.Highlighted["TargetLast"] then 
 		self:UnHighlight(self.Highlighted["OrigLast"],"OrigLast") 
@@ -289,7 +288,8 @@ function Board:PickUpPiece(tile,image)
 			local newTile = self:GetTargetTile(tempPiece.AbsolutePosition+offeset)
 			destroy()
 			if newTile then
-				local canMove = self.Board:IsLegalMove(tile.Position,newTile.Position)
+				local handler = self.Board:GetColorState(tile.Piece.IsBlack)
+				local canMove = handler:IsLegalMove(tile.Position)
 				if canMove then
 					self.Board:Move(tile.Position,newTile.Position)
 				end
@@ -301,17 +301,19 @@ end
 
 --// Activation
 function Board:Activate()
-	local board = self.Board.Board
+	local board = self.Board.Board:getState()
 	for pos,tile in pairs(board) do
-		local currentPos = BoardUtil.IntToVector2(pos)
-		local visTile = VisBoard[currentPos.X][currentPos.Y]
-		self.__maid:GiveTask(visTile.Piece.MouseButton1Down:Connect(function()
-			if self.CanPickUp then
-				self:PickUpPiece(tile,visTile.Piece)
-			end
-		end))
+		if typeof(pos) == "number" then
+			local currentPos = BoardUtil.IntToVector2(pos)
+			local visTile = VisBoard[currentPos.X][currentPos.Y]
+			self.__maid:GiveTask(visTile.Piece.InputBegan:Connect(function(input)
+				if self.CanPickUp and input.UserInputType == Enum.UserInputType.MouseButton1 then
+					self:PickUpPiece(tile,visTile.Piece)
+				end
+			end))
+		end
 	end
-	self.Board.AfterMoved:Connect(function(oldPos,newPos)
+	self.Board.OnPostStep:Connect(function(oldPos,newPos)
 		self:UpdatePosition(oldPos,newPos)		
 	end)
 	self.Board.StartTime =  tick()
