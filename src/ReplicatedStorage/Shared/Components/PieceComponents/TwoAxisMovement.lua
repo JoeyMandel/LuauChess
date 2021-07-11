@@ -74,10 +74,10 @@ function TwoAxisMovement:ComputeLegalMoves()
 		end
 	end
 	
-	processPath(Vector2.new(1,1))
-	processPath(Vector2.new(-1,1))
-	processPath(Vector2.new(1,-1))
-	processPath(Vector2.new(-1,-1))
+	processPath(Vector2.new(1,0))
+	processPath(Vector2.new(-1,0))
+	processPath(Vector2.new(0,-1))
+	processPath(Vector2.new(0, 1))
 end
 
 function TwoAxisMovement.new(piece,config)
