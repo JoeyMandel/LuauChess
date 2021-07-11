@@ -37,8 +37,10 @@ function BoardUtil.IntToVector2(intVal)
 end
 
 function BoardUtil.Vector2ToInt(valX,valY) --// Allows you to use the X and Y values to create the pos. 
-	local pos = valY and Vector2.new(valX,valY) or valX
-	return ((pos.X-1)*9) + pos.Y    
+	local y = typeof(valY) == "number" and valY or valX.Y
+	local x = typeof(valX) == "number" and valX or valX.X
+
+	return ((x-1)*9) + y  
 end
 
 function BoardUtil.GetColor(isBlack)
@@ -59,27 +61,25 @@ function BoardUtil.FireRayInDirection(board,orig, dir, collisionCheck)
 
 	local delta_x = dir.X 
 	local delta_y = dir.Y 
-	local slope = delta_y/delta_x
 	
-	local next = nil
 	local offset = Vector2.new()
+	local next = nil
 
 	local function getNext()
-		local c_X = offset.X + 1
-		return Vector2.new(c_X, math.floor(c_X * slope))
+		local c_X = offset.X + delta_x
+		return Vector2.new(math.floor(offset.X + delta_x), math.floor(offset.Y + delta_y))
 	end
 
-	repeat 
+	repeat
 		offset = getNext()
 		next = orig + getNext()
-
-		local value = board[BoardUtil.Vector2ToInt(next)]
+		local value = board[BoardUtil.Vector2ToInt(orig + offset)]
 		if value then
 			if collisionCheck(value) then
 				table.insert(collisions, value)
 			end
 		end
-	until next.X > 8 or next.Y > 8
+	until not BoardUtil.IsPositionValid(next)
 
 	return collisions
 end
@@ -92,12 +92,14 @@ function BoardUtil.FireRayToPoint(board, orig, target, collisionCheck)
 	local slope = delta_y/delta_x
 	
 	for x = 1, delta_x do
-		local y = math.floor(x * slope)
+		local y = math.floor(math.abs(x) * slope)
 		local currentPosition = Vector2.new(orig.X + x, orig.Y +  y)
 		local value = board[BoardUtil.Vector2ToInt(currentPosition)]
 
-		if collisionCheck(value) then
-			table.insert(collisions, value)
+		if value then
+			if collisionCheck(value) then
+				table.insert(collisions, value)
+			end
 		end
 	end
 

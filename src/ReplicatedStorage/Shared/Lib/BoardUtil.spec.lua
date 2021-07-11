@@ -44,7 +44,6 @@ return function()
                     end
                 end
             end
-            print(collisions)
             expect(allLarger).to.equal(true)
         end)
     end)
