@@ -10,7 +10,9 @@ function TestController:KnitStart()
     local TestEZ = require(Knit.Shared.Lib.TestEZ)
     
     TestEZ.TestBootstrap:run({
-        Knit.Shared.Lib,
+        Knit.Shared,
+    }, nil, {
+        ["showTimingInfo"] = true,
     })
 end
 
