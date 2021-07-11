@@ -18,14 +18,14 @@ KingMovement.__index = KingMovement
 
 function KingMovement:ComputeLegalMoves()
 	local piece = self.Piece
-	local board = piece.Board.Board
 	local piecePos = piece.Position
-	local opColor = piece.IsBlack and "White" or "Black"
+	local oppHandler = self.Board:GetColorState(not piece.IsBlack)
+
 	for xOff = -1,1,1 do
 		for yOff = -1,1,1 do
-			local currentPos = piecePos + toInt(xOff,yOff)
+			local currentPos = piecePos + Vector2.new(xOff,yOff)
 			piece:AddAttackingMove(currentPos)
-			if ((xOff == 0) and (yOff == 0)) or piece.Board:IsAttacking(opColor,currentPos) then
+			if ((xOff == 0) and (yOff == 0)) or oppHandler:IsAttacking(currentPos) then
 				continue
 			end
 			piece:AddLegalMove(currentPos)

@@ -44,7 +44,7 @@ function DiagonalMovement:ComputeLegalMoves()
 		if firstHit then
 			--Must be checking the enemy king!
 			if firstHit:HasTag("King") and firstHit.IsBlack ~= pieceColor then
-				checking = true
+				checking = true 
 			end
 		end
 		if secondHit then
@@ -53,15 +53,13 @@ function DiagonalMovement:ComputeLegalMoves()
 				pinning = true
 			end
 		end
-
 		for _, tile in ipairs(path) do
 			local pos = tile.Position
-
 			if checking or pinning then
 				piece:AddToPath(pos)
 			end
 			piece:AddAttackingMove(pos)
-
+			
 			if tile.Piece then
 				if tile.Piece.IsBlack ~= pieceColor then
 					piece:AddLegalMove(pos)
@@ -72,7 +70,6 @@ function DiagonalMovement:ComputeLegalMoves()
 			end
 		end
 	end
-	
 	processPath(Vector2.new(1,1))
 	processPath(Vector2.new(-1,1))
 	processPath(Vector2.new(1,-1))
