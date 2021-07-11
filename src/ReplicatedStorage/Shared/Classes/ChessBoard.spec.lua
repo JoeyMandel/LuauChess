@@ -10,6 +10,16 @@ return function()
         it("Returns a ChessBoard", function()
             expect(board.Class).to.equal("ChessBoard")
         end)
+        
+        it("Has only two kings", function()
+            local numberOfKings = 0
+            for _, piece in pairs(board.Pieces) do
+                if piece:HasTag("King") then
+                    numberOfKings += 1
+                end
+            end
+            expect(numberOfKings).to.equal(2)
+        end)
 
         local currentState = board.Board:getState()
 
@@ -26,10 +36,11 @@ return function()
         local function checkValid(pieceTag, ...) 
             local whiteFiles = {...}
             local valid = true
-            for _, pos in ipairs(whiteFiles) do
-                if not isValidPos(Vector2.new(pos.X, 1), pieceTag, false) then valid = false break end
-                if not isValidPos(Vector2.new(pos.X, 8), pieceTag, true) then valid = false break end
+            for _, x in ipairs(whiteFiles) do
+                if not isValidPos(Vector2.new(x, 1), pieceTag, false) then valid = false break end
+                if not isValidPos(Vector2.new(x, 8), pieceTag, true) then valid = false break end
             end
+            return valid
         end
 
         it("Has valid pawns", function()
@@ -38,7 +49,7 @@ return function()
                 if not isValidPos(Vector2.new(file ,7), "Pawn", true) then valid = false break end
             end
             for file = 1,8 do
-                if isValidPos(Vector2.new(file, 2), "Pawn", false) then valid = false break end
+                if not isValidPos(Vector2.new(file, 2), "Pawn", false) then valid = false break end
             end
             expect(valid).to.equal(true)
         end)
@@ -51,7 +62,7 @@ return function()
             expect(valid).to.equal(true)
         end)
         it("Has valid bishops", function()
-            local valid = checkValid("Knight", 3,6)
+            local valid = checkValid("Bishop", 3,6)
             expect(valid).to.equal(true)
         end)
         it("Has valid queen", function()
@@ -64,4 +75,25 @@ return function()
         end)
     end)
 
+    local white = board.White
+    local black = board.Black
+    describe("Correct Color Handlers", function()
+        it("Should return only 1 king per handler", function()
+            local valid = true
+            if #white:GetPiecesOfType("King") ~= 1 or #black:GetPiecesOfType("King") ~= 1 then
+                valid = false
+            end
+            expect(valid).to.equal(true)
+        end)
+        it("Should return only 2 rooks per handler", function()
+            local valid = true
+            if #white:GetPiecesOfType("Rook") ~= 2 or #black:GetPiecesOfType("Rook") ~= 2 then
+                valid = false
+            end
+            expect(valid).to.equal(true)
+        end)
+    end)
+    -- describe("Valid Basic Movement", function()
+    
+    -- end)
 end

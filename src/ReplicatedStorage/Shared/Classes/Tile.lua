@@ -25,7 +25,7 @@ function Tile.new(position)
 		["IsDark"] = false,
 		["Piece"] = nil,
 	}, Tile)
-	return self
+	return self 
 	
 end
 

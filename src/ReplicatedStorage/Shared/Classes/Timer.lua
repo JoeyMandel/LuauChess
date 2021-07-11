@@ -8,10 +8,11 @@
 	
 
 --]]
-local UniversalClock
-local Thread
-local Maid
-local Signal
+local Knit = require(game:GetService("ReplicatedStorage").Knit)
+
+local Thread = require(Knit.Shared.Lib.Thread)
+local Maid = require(Knit.Shared.Lib.Maid)
+local Signal = require(Knit.Shared.Lib.Signal)
 
 local StatusHierarchy = {
 	["Active"] = 1,
@@ -103,16 +104,6 @@ end
 function Timer:Destroy()
 	self.OnEnd:Fire()
 	self.__maid:DoCleaning()
-end
-
-function Timer:Init()
-	local _shared = self.Shared
-	local utils = _shared.Lib
-	
-	Maid = utils.Maid
-	Thread = utils.Thread
-	Signal = utils.Signal
-	UniversalClock = utils.UniversalClock
 end
 
 return Timer
