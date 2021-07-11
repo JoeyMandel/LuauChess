@@ -14,7 +14,12 @@
 	ChessBoard:Move()
 		Validates the move and if it is valid then it calls step with the proper actions
 
-	ChessBoard:Step()
+	ChessBoard:GetPieceFromPosition(pos)
+		Returns the piece at the inputted position
+	ChessBoard:GetColorState(isBlack)
+		Returns the related color handler
+
+	ChessBoard:Step(actions)
 		Calls all Step related methods
 	ChessBoard:PreStep(actions)
 		Performs various actions before stepping through
@@ -84,6 +89,7 @@ function ChessBoard.new(state)
 		self:LoadFromFEN(state)
 	end
 --	self:UpdateMoves()
+	self:ComputeMoves()
 	return self
 end
 
@@ -142,13 +148,22 @@ function ChessBoard:Move(piecePos, targetPos, input)
 	local board = self.Board:getState()
 	local piece = BoardUtil.Get(board, piecePos)
 
-	if piece and self:IsLegalMove(piecePos, targetPos) and (not piece.IsBlack == self.WhiteToNextMove) then
+	local colorState = self:GetColorState(piece.IsBlack)
+
+	if piece and colorState:IsLegalMove(piecePos, targetPos) and (not piece.IsBlack == self.WhiteToNextMove) then
 		local actions = piece:CreateAction(targetPos, input)
 		self:Step(actions)
 	end
 end
 
 --// Utils
+
+function ChessBoard:ComputeMoves()
+	for _, piece in pairs(self.Pieces) do
+		piece:ComputeLegalMoves()
+	end
+end
+
 --// Init Fen 
 --//rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 function ChessBoard:LoadFromFEN(state)
@@ -166,11 +181,6 @@ function ChessBoard:LoadFromFEN(state)
 				local realPiece = initialToName[string.lower(char)]
 				local isBlack = (char == string.lower(char)) 
 
-				print(BoardActions.createCreate({
-					["Target"] = Vector2.new(currentFile, currentRank),
-					["Type"] = realPiece,
-					["IsBlack"] = isBlack,
-				}))
 				self.Board:dispatch(
 					BoardActions.createCreate({
 						["Target"] = Vector2.new(currentFile, currentRank),
@@ -186,6 +196,13 @@ function ChessBoard:LoadFromFEN(state)
 	end
 
 	self.WhiteToNextMove = (fields[2] == "w" and true) or false
+end
+
+function ChessBoard:GetPieceFromPosition(pos)
+	local board = self.Board:getState()
+	local tile = BoardUtil.Get(board,pos)
+
+	return tile and tile.Piece or nil
 end
 
 function ChessBoard:GetColorState(isBlack)
