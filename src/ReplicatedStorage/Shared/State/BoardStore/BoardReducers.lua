@@ -67,9 +67,8 @@ function ReducerFuncs.Create(state, action)
     local newState = shallowCopyState(state)
     
     local boardObject = newState.Board
-    local target = v2ToInt(action.target)
-    local targetTile  = newState[target]
-    print("Created")
+    local target = action.target
+    local targetTile  = newState[v2ToInt(target)]
 
     local newPiece = Piece.new({
         ["Type"] = action.pieceType,
@@ -77,13 +76,11 @@ function ReducerFuncs.Create(state, action)
         ["Board"] = boardObject,
         ["Color"] = action.isBlack,
     })
-    print("Created Piece")
 
     targetTile.Piece = newPiece
 
     table.insert(boardObject.Pieces, newPiece)
-    table.insert(boardObject[BoardUtil.GetColor(action.Color)].Pieces, newPiece)
-
+    table.insert(boardObject:GetColorState(action.isBlack).Pieces, newPiece)
     return newState
 end
 
