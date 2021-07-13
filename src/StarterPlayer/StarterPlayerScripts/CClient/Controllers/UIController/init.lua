@@ -24,7 +24,7 @@ function UIController:KnitStart()
 		self.UIs[name] = require(mod)
 		self.UIs[name]:Init(self)
 	end
-	local board = require(Knit.Shared.Classes.ChessBoard).new("8/8/4k3/8/4K3/2RN2Q1/8/8 w - - 0 1")
+	local board = require(Knit.Shared.Classes.ChessBoard).new("4k3/8/8/8/8/8/8/R1N1K2R w - - 0 1")
 	
 	self.UIs.Timers:SetConfig(board)
 	self.UIs.Board:SetBoard(board)

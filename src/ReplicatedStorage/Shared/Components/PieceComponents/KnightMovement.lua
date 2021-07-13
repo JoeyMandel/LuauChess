@@ -22,17 +22,13 @@ function KnightMovement:ComputeLegalMoves()
 	--//For each axis, Y = -2, 2, X = -2,2, Go left or right one square and see if we can move to it
 	for off1 = -2,2,4 do
 		for off2 = -1,1,2 do
-			local posX = pos.X
-			local posY = pos.Y
+			local pos1 = pos + Vector2.new(off1, off2)  
+			local pos2 = pos + Vector2.new(off2, off1)
 
-			local pos1 = Vector2.new(posX + off1,posY + off2)
-			local pos2 = Vector2.new(posX + off2,posY + off2)
-
-
-			piece:AddLegalMove(pos2) --//For X
+			piece:AddLegalMove(pos2) 
 			piece:AddAttackingMove(pos2)
 
-			piece:AddLegalMove(pos1) --//For Y
+			piece:AddLegalMove(pos1) 
 			piece:AddAttackingMove(pos1)		
 		end
 	end

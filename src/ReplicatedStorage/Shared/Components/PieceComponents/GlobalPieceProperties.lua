@@ -24,45 +24,45 @@ function GlobalPieceProperties:FilterLegalMoves()
 	local oppColor = BoardUtil.GetColor(not pieceIsBlack)
 	local color = BoardUtil.GetColor(pieceIsBlack)
 	
-	local opp = board[oppColor]
-	local current = board[color]
+	local oppHandler = board[oppColor]
+	local currentHandler = board[color]
 
-	for pos,moveInfo in pairs(legalMoves) do
-		local currentPos = BoardUtil.IntToVector2(pos)
-		local currentPiece = board:GetPieceFromPosition(currentPos)
+	for pos, _ in pairs(legalMoves) do
+		local movePos = BoardUtil.IntToVector2(pos)
+		local pieceOfPos = board:GetPieceFromPosition(movePos)
+
 		local isValidPinnedMove = true	
 		
-		for pinningPiece,_ in pairs(piece.PinnedBy) do
+		for pinningPiece, _ in pairs(piece.PinnedBy) do
 			local pinningPath = pinningPiece.PathOfAttack --//Note: this assumes there is only one enemy king and you can only pin one piece at a time
-			isValidPinnedMove = (isValidPinnedMove and BoardUtil.Get(pinningPath,currentPos))
+			isValidPinnedMove = (isValidPinnedMove and BoardUtil.Get(pinningPath,movePos))
 		end
 		
 		if not isValidPinnedMove then
-			piece:RemoveLegalMove(currentPos)
+			piece:RemoveLegalMove(movePos)
 		end
-		if currentPiece then
-			if currentPiece.IsBlack == pieceIsBlack then
-				piece:RemoveLegalMove(currentPos)
+		if pieceOfPos then
+			if pieceOfPos.IsBlack == pieceIsBlack then
+				piece:RemoveLegalMove(movePos)
 			end
 		end
-		if piece.Type ~= "King" then
-			if #current.Checking >= 1 then
-				for _,checker in pairs(current.Checking) do
+		if not piece:HasTag("King") then
+			if #currentHandler.Checking >= 1 then
+				for _,checker in pairs(currentHandler.Checking) do
 					local attacking = checker.PathOfAttack
-					if not BoardUtil.Get(attacking,currentPos) then
-						piece:RemoveLegalMove(currentPos)
+					if not BoardUtil.Get(attacking,movePos) then
+						piece:RemoveLegalMove(movePos)
 					end
 				end
 			end
 		end
 	end
-	local oppHandler = board:GetColorState(not piece.IsBlack)
+
 	local oppKing = oppHandler:GetPiecesOfType("King")[1]
-	--// If attacking king then add to checking
 	
 	if BoardUtil.Get(piece.Attacking,oppKing.Position) then
 		warn("[Client Board]:"..oppColor.." King is in check from "..color.. " "..piece.Type.."! | "..tostring(piece.Position))
-		table.insert(opp.Checking,piece)
+		table.insert(oppHandler.Checking,piece)
 	end
 end
 

@@ -159,9 +159,19 @@ end
 --// Utils
 
 function ChessBoard:ComputeMoves()
-	for _, piece in pairs(self.Pieces) do
+	local start = os.clock()
+	local white = self.White
+	local black = self.Black
+	for _, piece in pairs(white.Pieces) do
 		piece:ComputeLegalMoves()
 	end
+	for _, piece in pairs(black.Pieces) do
+		piece:ComputeLegalMoves()
+	end
+	for _, piece in pairs(white.Pieces) do
+		piece:ComputeLegalMoves()
+	end
+	warn("Took ", os.clock() - start, " to compute moves")
 end
 
 --// Init Fen 
