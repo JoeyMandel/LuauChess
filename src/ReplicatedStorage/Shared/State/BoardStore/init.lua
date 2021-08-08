@@ -24,6 +24,7 @@ function BoardStore.new(board)
 		end
 	end	
 	initState.Board = board
+	initState.ActionHistory = {}
     return Rodux.Store.new(reducer,initState)
 end
 

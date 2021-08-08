@@ -40,6 +40,7 @@ function ReducerFuncs.Move(state, action)
     origTile.Piece = nil
     targetTile.Piece = origPiece
 
+    table.insert(newState.ActionHistory, action)
     return newState
 end
 
@@ -60,6 +61,7 @@ function ReducerFuncs.Destroy(state, action)
     targetTile.Piece:Destroy()
     targetTile.Piece = nil
 
+    table.insert(newState.ActionHistory, action)
     return newState
 end
 
@@ -81,6 +83,8 @@ function ReducerFuncs.Create(state, action)
 
     table.insert(boardObject.Pieces, newPiece)
     table.insert(boardObject:GetColorState(action.isBlack).Pieces, newPiece)
+
+    table.insert(newState.ActionHistory, action)
     return newState
 end
 

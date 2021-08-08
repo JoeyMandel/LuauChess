@@ -1,4 +1,5 @@
 local Knit = require(game:GetService("ReplicatedStorage").Knit)
+local TableUtil = require(script.Parent.TableUtil)
 
 return function()
     local BoardUtil = require(script.Parent.BoardUtil)

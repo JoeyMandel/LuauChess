@@ -141,11 +141,6 @@ function Signal:Destroy()
 	self._bindable:Destroy()
 end
 
-
-function Signal:Init()
-	Promise = require(script.Parent.Promise)
-
-end
-
+Promise = require(script.Parent.Promise)
 
 return Signal

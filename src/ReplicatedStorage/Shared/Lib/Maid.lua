@@ -146,10 +146,7 @@ function Maid:DoCleaning()
 end
 
 
-function Maid:Init()
-	Promise = require(script.Parent.Promise)
-end
-
+Promise = require(script.Parent.Promise)
 
 --- Alias for DoCleaning()
 -- @function Destroy
