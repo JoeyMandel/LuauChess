@@ -1,5 +1,5 @@
 local RunService = game:GetService("RunService")
-if RunService:IsStudio() then
+if RunService:IsClient() and RunService:IsServer() then -- Must really be in studio
 	return {
 		["Server"] = game:GetService("ServerScriptService").CServer,
 		["Shared"] = game:GetService("ReplicatedStorage").Shared,

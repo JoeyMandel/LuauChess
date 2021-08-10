@@ -13,11 +13,10 @@ local function shallowCopyState(oldState)
 end
 
 function ReducerFuncs.AssignAppTheme(state, action)
+    local newState = shallowCopyState(state)
+    newState.AppTheme = action.target
 
-end
-
-function ReducerFuncs.AssignBoardTheme(state, action)
-
+    return newState
 end
 
 return ReducerFuncs

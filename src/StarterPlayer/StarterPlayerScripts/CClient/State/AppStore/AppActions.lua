@@ -4,13 +4,6 @@ local Rodux = require(Knit.Shared.Lib.Rodux)
 
 local AppActions = {}
 
-function AppActions.createAssignBoardTheme(config)
-    return {
-        ["type"] = "AssignBoardTheme",
-        ["target"] = config.TargetTheme,
-    }
-end
-
 function AppActions.createAssignAppTheme(config)
     return {
         ["type"] = "AssignAppTheme",

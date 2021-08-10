@@ -3,17 +3,20 @@ local Rodux = require(Knit.Shared.Lib.Rodux)
 
 local Themes = require(Knit.Client.Controllers.UIController.Themes)
 
-local reducers = require(script.AppReducers)
+local reducers = require(script.BoardGuiReducers)
 local reducer = Rodux.createReducer(nil,reducers)
 
-local AppStore = {}
+local BoardGuiStore = {}
 
-function AppStore.new()
+function BoardGuiStore.new()
 	local initState = {
-		["AppTheme"] = Themes.AppThemes.Dark,
+		["BoardTheme"] = Themes.BoardThemes["Ocean Blue"],
+		["PieceTheme"] = Themes.PieceThemes.Default,
+		["InvisiblePieces"] = {},
+		["IsFlipped"] = false,
 	}
 
     return Rodux.Store.new(reducer,initState)
 end
 
-return AppStore
+return BoardGuiStore
