@@ -1,15 +1,15 @@
-local BitBoardClass = {}
-BitBoardClass.__index = BitBoardClass
+local BoardClass = {}
+BoardClass.__index = BoardClass
 
 
-function BitBoardClass.new()
+function BoardClass.new()
     local self = setmetatable({
         ["Map"] = table.create(64, false)
-    }, BitBoardClass)
+    }, BoardClass)
     return self
 end
 
-function BitBoardClass:SetRow(row, value)
+function BoardClass:SetRow(row, value)
     for x = 0, 7 do
         self:SetValueAt(
             self.PosToIndex(x, row),
@@ -18,20 +18,20 @@ function BitBoardClass:SetRow(row, value)
     end
 end
 
-function BitBoardClass:SetValueAt(index, target)
+function BoardClass:SetValueAt(index, target)
     self.Map[index] = target
 end
 
-function BitBoardClass:GetValueAt(index)
+function BoardClass:GetValueAt(index)
     return self.Map[index]
 end
 
-function BitBoardClass.IndexToPos(index)
+function BoardClass.IndexToPos(index)
     return math.floor(index / 8), index  % 8
 end
 
-function BitBoardClass.PosToIndex(x, y)
+function BoardClass.PosToIndex(x, y)
     return x * 8 + y
 end
 
-return BitBoardClass
+return BoardClass

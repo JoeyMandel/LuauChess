@@ -21,13 +21,4 @@ function CustomEnum:GetEnumName(enum)
 	return -1
 end
 
-return {
-    ["PIECES"] = CustomEnum.new(
-        "PAWN",
-        "ROOK",
-        "BISHOP",
-        "KNIGHT",
-        "QUEEN",
-        "KING"
-    )
-}
+return CustomEnum
