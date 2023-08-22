@@ -20,7 +20,6 @@ end
 
 function ChessGameClass:Play(startingPositionFEN)
     local boardStatus = BoardLoader.CreateBoardStatus(startingPositionFEN)
-    print(boardStatus)
 end
 
 function ChessGameClass:Stop()

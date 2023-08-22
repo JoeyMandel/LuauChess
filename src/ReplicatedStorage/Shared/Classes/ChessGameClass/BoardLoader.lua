@@ -115,10 +115,14 @@ local function getFullMoveCount(moveCountField)
     return tonumber(moveCountField) or 1
 end
 
---[[
-    rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
-]]
+--[=[
+    Converts a FEN string into an easy to read format in our scripts
 
+    Starting Position as a FEN String:
+    ```
+    "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    ```
+]=]
 function BoardLoader.CreateBoardStatus(fenString): BoardStatus
     local fields = fenString:split(" ")
     local piecePositionsField = fields[1]
