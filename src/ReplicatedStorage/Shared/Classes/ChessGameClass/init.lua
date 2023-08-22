@@ -13,13 +13,24 @@ local ChessGameClass = {}
 ChessGameClass.__index = ChessGameClass
 
 function ChessGameClass.new()
-    local self = setmetatable({}, ChessGameClass)
+    local self = setmetatable({
+        ["BoardState"] = nil,
+        ["PseudoLegalMovesMap"] = nil,
+        ["MoveMasksMap"] = nil,
+    }, ChessGameClass)
 
     return self
 end
 
 function ChessGameClass:Play(startingPositionFEN)
-    local boardStatus = BoardLoader.CreateBoardStatus(startingPositionFEN)
+    local boardState = BoardLoader.CreateBoardStatus(startingPositionFEN)
+    print(boardState.PiecesMap)
+    self:UpdateGame(boardState)
+
+end
+
+function ChessGameClass:UpdateGame(boardState)
+    self.BoardState = boardState
 end
 
 function ChessGameClass:Stop()
