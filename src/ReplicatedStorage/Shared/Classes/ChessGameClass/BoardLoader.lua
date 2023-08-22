@@ -10,7 +10,7 @@ local ChessConstants = require(script.Parent.ChessConstants)
 
 local PIECES_CONSTS = ChessConstants.PIECES
 
-type BoardStatus = {
+type BoardState = {
     ["PiecesMap"] : table,
     ["IsWhiteToMove"] : boolean,
     ["CastlingRights"] : table,
@@ -35,30 +35,42 @@ local letterToPiece = {
     ["K"] = PIECES_CONSTS.W_KING
 }
 
+local function reverseArray(tbl)
+	local itemCount = #tbl
+	local reversedArray = table.create(itemCount)
+	for index = 1,itemCount do
+		reversedArray[index] = tbl[itemCount - index + 1]
+	end
+	return reversedArray
+end
+
 local BoardLoader = {}
 
 local function createPiecesMap(piecePositionsField)
     local piecesMap = MapClass.new()
+    local ranks = reverseArray(piecePositionsField:split("/"))
 
-    local currentPosition = 0
-    for letterIndex = 1, piecePositionsField:len() do
-        local pieceLetter = piecePositionsField:sub(letterIndex, letterIndex)
-        local pieceEnum = letterToPiece[pieceLetter]
+    for index, piecePositions in pairs(ranks) do
+        local currentRank = index - 1
+        local currentFile = 0
+        
+        for letterIndex = 1, piecePositions:len() do
+            local pieceLetter = piecePositions:sub(letterIndex, letterIndex)
+            local pieceEnum = letterToPiece[pieceLetter]
 
-        local isLetterDivider = pieceLetter == "/"
+            local numberOfEmptySpaces = tonumber(pieceLetter)
+            local isLetterEmptySpaceCount = typeof(numberOfEmptySpaces) == "number"
 
-        local numberOfEmptySpaces = tonumber(pieceLetter)
-        local isLetterEmptySpaceCount = typeof(numberOfEmptySpaces) == "number"
+            local pieceIndex = piecesMap.PosToIndex(currentFile, currentRank)
 
-        if isLetterEmptySpaceCount then
-            currentPosition += numberOfEmptySpaces
-            continue
-        elseif isLetterDivider then
-            continue
+            if isLetterEmptySpaceCount then
+                currentFile += numberOfEmptySpaces
+                continue
+            end
+
+            piecesMap:SetValueAt(pieceIndex, pieceEnum)
+            currentFile += 1
         end
-
-        piecesMap:SetValueAt(currentPosition, pieceEnum)
-        currentPosition += 1
     end
 
     return piecesMap
@@ -123,7 +135,7 @@ end
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     ```
 ]=]
-function BoardLoader.CreateBoardStatus(fenString): BoardStatus
+function BoardLoader.CreateBoardStatus(fenString): BoardState
     local fields = fenString:split(" ")
     local piecePositionsField = fields[1]
     local playerToMoveField = fields[2]
