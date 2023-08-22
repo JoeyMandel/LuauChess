@@ -1,15 +1,15 @@
-local BoardClass = {}
-BoardClass.__index = BoardClass
+local MapClass = {}
+MapClass.__index = MapClass
 
 
-function BoardClass.new()
+function MapClass.new()
     local self = setmetatable({
         ["Map"] = table.create(64, false)
-    }, BoardClass)
+    }, MapClass)
     return self
 end
 
-function BoardClass:SetRow(row, value)
+function MapClass:SetRow(row, value)
     for x = 0, 7 do
         self:SetValueAt(
             self.PosToIndex(x, row),
@@ -18,20 +18,20 @@ function BoardClass:SetRow(row, value)
     end
 end
 
-function BoardClass:SetValueAt(index, target)
+function MapClass:SetValueAt(index, target)
     self.Map[index] = target
 end
 
-function BoardClass:GetValueAt(index)
+function MapClass:GetValueAt(index)
     return self.Map[index]
 end
 
-function BoardClass.IndexToPos(index)
+function MapClass.IndexToPos(index)
     return math.floor(index / 8), index  % 8
 end
 
-function BoardClass.PosToIndex(x, y)
+function MapClass.PosToIndex(x, y)
     return x * 8 + y
 end
 
-return BoardClass
+return MapClass

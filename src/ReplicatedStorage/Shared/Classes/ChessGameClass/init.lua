@@ -1,31 +1,19 @@
+--[[
+
+UnknownParabellum
+8/19/2023
+ChessGameClass:
+    Acts as a simple front-end interface to internal chess game logic
+
+]]
+
 local PlayerClass = require(script.PlayerClass)
-local ChessConstants = require(script.Parent.ChessConstants)
-local PIECES_CONSTS = ChessConstants.PIECES
-
-local CONST_PAWN = PIECES_CONSTS.PAWN
-local CONST_ROOK = PIECES_CONSTS.ROOK
-local CONST_BISHOP = PIECES_CONSTS.BISHOP
-local CONST_KNIGHT = PIECES_CONSTS.KNIGHT
-local CONST_QUEEN = PIECES_CONSTS.QUEEN
-local CONST_KING = PIECES_CONSTS.KING
-
-local letterToPiece = {
-    ["p"] = CONST_PAWN,
-    ["r"] = CONST_ROOK,
-    ["b"] = CONST_BISHOP,
-    ["n"] = CONST_KNIGHT,
-    ["q"] = CONST_QUEEN,
-    ["k"] = CONST_KING
-}
 
 local ChessGameClass = {}
 ChessGameClass.__index = ChessGameClass
 
 function ChessGameClass.new()
-    local self = setmetatable({
-        ["White"] = PlayerClass.new(),
-        ["Black"] = PlayerClass.new(), 
-    }, ChessGameClass)
+    local self = setmetatable({}, ChessGameClass)
 
     return self
 end
@@ -40,8 +28,7 @@ function ChessGameClass:Stop()
     
 end
 
-
-function ChessGameClass:__init_board()
+function ChessGameClass:MakeMove()
     
 end
 

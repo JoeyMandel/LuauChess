@@ -23,11 +23,18 @@ end
 
 return {
     ["PIECES"] = CustomEnum.new(
-        "PAWN",
-        "ROOK",
-        "BISHOP",
-        "KNIGHT",
-        "QUEEN",
-        "KING"
+        "B_PAWN",
+        "B_ROOK",
+        "B_BISHOP",
+        "B_KNIGHT",
+        "B_QUEEN",
+        "B_KING",
+
+		"W_PAWN",
+        "W_ROOK",
+        "W_BISHOP",
+        "W_KNIGHT",
+        "W_QUEEN",
+        "W_KING"
     )
 }

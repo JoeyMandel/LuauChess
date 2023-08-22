@@ -1,4 +1,4 @@
-local BoardClass = require(script.Parent.BoardClass)
+local MapClass = require(script.Parent.MapClass)
 local ChessConstants = require(script.Parent.ChessConstants)
 local PIECES_CONSTS = ChessConstants.PIECES
 
@@ -9,13 +9,12 @@ PlayerClass.__index = PlayerClass
 function PlayerClass.new()
     local self = setmetatable({
         ["PiecesMaps"] = {},
-
-        ["ThreatMap"] = BoardClass.new(),
-        ["PinMap"] = BoardClass.new()
+        ["ThreatMap"] = MapClass.new(),
+        ["PinMap"] = MapClass.new()
     }, PlayerClass)
 
     for _, piece in pairs(PIECES_CONSTS) do
-        self.PiecesMaps[piece] = BoardClass.new() 
+        self.PiecesMaps[piece] = MapClass.new() 
     end
 
     return self
