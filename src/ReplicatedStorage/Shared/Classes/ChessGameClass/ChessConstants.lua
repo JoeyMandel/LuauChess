@@ -1,8 +1,8 @@
-local CustomEnum = {}
-CustomEnum.__index = CustomEnum
+local PieceEnum = {}
+PieceEnum.__index = PieceEnum
 
-function CustomEnum.new(...)
-	local self = setmetatable({}, CustomEnum)
+function PieceEnum.new(...)
+	local self = setmetatable({}, PieceEnum)
 
 	for index, name in pairs({...}) do
 		self[name] = index - 1
@@ -11,7 +11,7 @@ function CustomEnum.new(...)
 	return self
 end
 
-function CustomEnum:GetEnumName(enum)
+function PieceEnum:GetEnumName(enum)
 	for name, value in pairs(self) do
 		if value == enum then
 			return name
@@ -21,8 +21,16 @@ function CustomEnum:GetEnumName(enum)
 	return -1
 end
 
+function PieceEnum:IsPieceWhite(pieceType)
+    if pieceType > self["B_KING"] then
+        return true
+    end
+
+    return false
+end
+
 return {
-    ["PIECES"] = CustomEnum.new(
+    ["PIECES"] = PieceEnum.new(
         "B_PAWN",
         "B_ROOK",
         "B_BISHOP",

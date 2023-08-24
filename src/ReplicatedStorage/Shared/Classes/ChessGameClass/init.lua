@@ -8,6 +8,7 @@ ChessGameClass:
 ]]
 
 local BoardLoader = require(script.BoardLoader)
+local PieceBehaviors = require(script.PieceBehaviors)
 
 local ChessGameClass = {}
 ChessGameClass.__index = ChessGameClass
@@ -24,13 +25,24 @@ end
 
 function ChessGameClass:Play(startingPositionFEN)
     local boardState = BoardLoader.CreateBoardStatus(startingPositionFEN)
-    print(boardState.PiecesMap)
     self:UpdateGame(boardState)
-
 end
 
 function ChessGameClass:UpdateGame(boardState)
+    local piecePositionsMap = boardState.PiecesMap
     self.BoardState = boardState
+    
+    piecePositionsMap:Visualize()
+
+    for position = 0, 63 do
+        local pieceType = piecePositionsMap:GetValueAt(position)
+        local pieceBehavior = PieceBehaviors:GetBehaviorFor(pieceType)
+
+        if pieceBehavior == nil then
+            continue
+        end
+        pieceBehavior.GetPieceBehavior(position, boardState)
+    end
 end
 
 function ChessGameClass:Stop()
