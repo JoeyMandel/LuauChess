@@ -4,8 +4,10 @@ MapClass.__index = MapClass
 
 function MapClass.new()
     local self = setmetatable({
-        ["Map"] = table.create(64, false)
+        ["Map"] = table.create(63, false)
     }, MapClass)
+
+    self.Map[0] = false
     return self
 end
 
@@ -23,6 +25,29 @@ end
 
 function MapClass.PosToIndex(x, y)
     return y * 8 + x
+end
+
+function MapClass:Visualize()
+    local text = "\n"
+
+    for index = 0, 63 do
+        local shouldAddNewLine = ((index + 1) % 8) == 0
+        local value = self:GetValueAt(index)
+        local character = tostring(value) .. " "
+
+        if value == false then
+            character = "- "
+        elseif value == true then
+            character = "# "
+        end
+
+        text = text .. character
+        
+        if shouldAddNewLine then
+            text = text .. "\n"
+        end
+    end
+    print(text)
 end
 
 return MapClass
