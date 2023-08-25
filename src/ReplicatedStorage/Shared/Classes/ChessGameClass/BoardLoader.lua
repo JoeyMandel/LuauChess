@@ -135,7 +135,7 @@ end
     "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     ```
 ]=]
-function BoardLoader.CreateBoardStatus(fenString): BoardState
+function BoardLoader.CreateBoardState(fenString): BoardState
     local fields = fenString:split(" ")
     local piecePositionsField = fields[1]
     local playerToMoveField = fields[2]

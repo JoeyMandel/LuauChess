@@ -73,7 +73,7 @@ local function findPseudoLegalMoves(piecePosition, boardState)
     return legalMoveMap
 end
 
-function Pawn.GetPieceBehavior(piecePosition, boardState)
+function Pawn.CreateBehavior(piecePosition, boardState)
     local pseudoLegalMoves = findPseudoLegalMoves(piecePosition, boardState)
 end
 

@@ -2,9 +2,11 @@ local MapClass = {}
 MapClass.__index = MapClass
 
 
-function MapClass.new()
+function MapClass.new(defaultValue)
+    defaultValue = defaultValue or false
+
     local self = setmetatable({
-        ["Map"] = table.create(63, false)
+        ["Map"] = table.create(63, defaultValue)
     }, MapClass)
 
     self.Map[0] = false
@@ -25,6 +27,21 @@ end
 
 function MapClass.PosToIndex(x, y)
     return y * 8 + x
+end
+
+function MapClass:CombineBinaryMaps(otherMap)
+    local combinedMap = MapClass.new()
+
+    for index = 0, 63 do
+        local thisValue = self:GetValueAt(index)
+        local otherValue = otherMap:GetValueAt(index)
+
+        local resultValue = thisValue or otherValue
+
+        combinedMap:SetValueAt(index, resultValue)
+    end
+
+    return combinedMap
 end
 
 function MapClass:Visualize()
